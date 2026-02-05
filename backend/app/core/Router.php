@@ -59,17 +59,17 @@ class Router
 
                 // resuelve el controller + metodo
                 [$controller, $methodName] = $route['action'];
-
-                // lee body JSON
+                // leer body JSON
                 $body = json_decode(file_get_contents("php://input"), true);
+                $body = $body ?? [];
 
-
-                // llama al controler 
+                // llamar al controller
                 call_user_func_array(
                     [$controller, $methodName],
-                    array_merge($matches, $body ? [$body] : [])
+                    array_merge($matches, [$body])
                 );
                 return;
+
             }
         }
 

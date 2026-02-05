@@ -74,6 +74,11 @@ Es el cerebro del sistema de rutas.
 4. MIDDLEWARE
 5. POSTMAN
 6. FRONTEND
+
+🧠 Regla de oro (guárdala)
+
+❝ En una API REST, el Router recibe el request
+y el Controller recibe los datos ❞
 -------------------------------------------------------------
 
 COMO PROBAR POSTMAN

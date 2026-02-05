@@ -24,7 +24,8 @@ class Question extends Model
         );
         $stmt->execute(["id" => $questionId]);
         // al tratarse de un find solo se trae un resultado por eso se usar fetch
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 
     public static function create($data)
