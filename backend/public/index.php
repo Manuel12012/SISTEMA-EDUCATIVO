@@ -1,6 +1,5 @@
 <?php
-define('BASE_PATH', dirname(__DIR__, 2)); 
-// sube desde public/api → backend
+define('BASE_PATH', dirname(__DIR__));
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
@@ -19,7 +18,7 @@ require_once BASE_PATH . '/app/controllers/QuestionController.php';
 
 // Routes
 
-require_once BASE_PATH . '/routes/api.php';
+require_once BASE_PATH . '/app/routes/api.php';
 
 // Ejecutar router
 Router::dispatch();
