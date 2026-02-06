@@ -4,6 +4,7 @@ require_once __DIR__ . '/../models/Exam.php';
 require_once __DIR__ . '/../models/Question.php';
 require_once __DIR__ . '/../models/ExamOption.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../models/ExamResult.php';
 
 
 class ExamController
@@ -54,4 +55,106 @@ class ExamController
             'questions' => $questions
         ]);
     }
+
+    public static function store($data)
+    {
+        if (
+            empty($data["course_id"]) ||
+            empty($data["titulo"]) ||
+            empty($data["duracion_minutos"])
+        ) {
+            Response::json([
+                "error" => "Datos incompletos"
+            ], 400);
+            exit;
+        }
+
+        $exam = Exam::create($data);
+
+        if (!$exam) {
+            Response::json([
+                "error" => "No se pudo crear la pregunta"
+            ], 500);
+        }
+
+        Response::json([
+            "message" => "Examen creado",
+            "id" => $exam
+        ], 201);
+    }
+
+    public static function update($examId, $data)
+    {
+        if (!is_numeric($examId)) {
+            Response::json(
+                [
+                    "error" => "ID invalido"
+                ],
+                400
+            );
+        }
+
+        $exam = Exam::find($examId);
+
+        if (!$exam) {
+            Response::json([
+                "error" => "Examen no encontrado"
+            ], 404);
+        }
+
+        $updated = Exam::update($examId, $data);
+
+        if (!$updated) {
+            Response::json([
+                "error" => "No se pudo actualizar el examen"
+            ], 404);
+        }
+
+        Response::json([
+            "message" => "Examen actualizado"
+        ]);
+    }
+
+    public static function destroy($examId){
+        if (!is_numeric($examId)) {
+            Response::json(
+                [
+                    "error" => "ID invalido"
+                ],
+                400
+            );
+        }
+
+        $exam= Exam::find($examId);
+
+        if(!$exam){
+            Response::json([
+                "error" => "No se pudo encontrar el examen"
+            ],404);
+        }
+
+        Exam::delete($examId);
+
+        Response::json([
+            "message" => "Examen eliminado"
+        ]);
+    }
+
+    public static function getResultByExam($examId){
+                if (!is_numeric($examId)) {
+            Response::json(
+                [
+                    "error" => "ID invalido"
+                ],
+                400
+            );
+            exit;
+        }
+
+        $examResult = ExamResult::getByExam($examId);
+                Response::json([
+            "examResult" => $examResult
+        ]);
+    }
+
 }

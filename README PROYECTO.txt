@@ -83,7 +83,50 @@ y el Controller recibe los datos ❞
 
 COMO PROBAR POSTMAN
 
-http://localhost/SISTEMA-EDUCATIVO/api/index.php
+🔜 ¿Qué sigue después de DELETE?
+
+Lo natural ahora es uno de estos:
+
+1️⃣ Validaciones avanzadas (422)
+2️⃣ Middleware (auth / roles)
+3️⃣ Consumo desde React (fetch / axios)
+4️⃣ Paginación y filtros
+5️⃣ Soft delete
+
+
+6️⃣ Resumen conceptual
+
+GET/DELETE → trabajan con ID, no necesitan body.
+
+POST/PUT → trabajan con datos en body JSON, pueden fallar si no se envían correctamente.
+
+Postman “no sabe” qué campos usar → tú debes proveerlos en JSON.
+
+Validar siempre datos en el controlador para evitar warnings y errores fatales.
+
+ !!OJO::Si tienes dos rutas idénticas (GET /courses/{id}), solo la primera registrada se ejecuta → la segunda nunca.
+
+Agregar un subrecurso como /modules hace que la ruta sea única:
+
+GET /courses/{id}          → devuelve información del curso
+GET /courses/{id}/modules  → devuelve los módulos de ese curso
+
+
+7️⃣ Regla definitiva (para tu bloc 🧠)
+
+🔹 El controlador depende del recurso inicial
+
+Empiezas con Question → QuestionController
+
+Empiezas con ExamOption → ExamOptionController
+
+Aunque el resultado final sea otro recurso
+
+📌 Regla para tu bloc
+
+🔹 Un subrecurso debe validar la existencia del recurso padre
+🔹 No tener resultados ≠ error
+🔹 ID inválido ≠ recurso no encontrado
 
 ------------------------------
 

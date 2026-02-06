@@ -43,6 +43,78 @@ class CourseController
         Response::json($course);
     }
 
+    public static function store($data){
+        if (
+            empty($data["titulo"]) ||
+            empty($data["descripcion"]) ||
+            empty($data["grado"])||
+            empty($data["created_at"])
+        ) {
+            Response::json([
+                "error" => "Datos incompletos"
+            ],400);
+            exit;
+        }
+
+        $course = Course::create($data);
+
+        if(!$course){
+            Response::json([
+                "error" => "No se pudo crear el curso"
+            ],500);
+        }
+
+        Response::json([
+            "message" => "Curso creado",
+            "id" => $course
+        ], 201);
+    }
+
+    public static function update($courseId, $data){
+        if(!is_numeric($courseId)){
+                Response::json([
+                    "error" => "ID invalido"
+                ], 400);
+        }
+
+        $updated = Course::update($courseId, $data);
+
+        if(!$updated){
+            Response::json([
+                "error" => "No se pudo actualizar"
+            ],500);
+        }
+
+        Response::json([
+            "message" => "Curso actualizado"
+        ]);
+    }
+
+    public static function destroy($courseId){
+        if (!is_numeric($courseId)) {
+            Response::json(
+                [
+                    "error" => "ID invalido"
+                ],
+                400
+            );
+        }
+
+        $course = Course::delete($courseId);
+
+        if(!$course){
+            Response::json([
+                "error" => "No se pudo encontrar el curso"
+            ],404);
+        }
+
+        Course::delete($courseId);
+
+        Response::json([
+            "message"=> "Curso eliminado"
+        ]);
+    }
+
     public static function modules($courseId)
     { // usamos esta funcion para traernos modulos mediante el id del curso
         if (!is_numeric($courseId)) {
