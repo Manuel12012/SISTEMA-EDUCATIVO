@@ -131,3 +131,9 @@ Aunque el resultado final sea otro recurso
 ------------------------------
 
 falta los modelos ()
+
+
+
+
+
+FALTA IMPLEMENTAR DE LESSON HACIA ABAJO 
