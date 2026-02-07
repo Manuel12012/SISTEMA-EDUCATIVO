@@ -128,12 +128,76 @@ Aunque el resultado final sea otro recurso
 🔹 No tener resultados ≠ error
 🔹 ID inválido ≠ recurso no encontrado
 
+vale entonces si es valido hacer consultas de hijos hacia padres pero con un join y haciendo uso de su fk y el id del padre(porque este no tiene fk)
+
+
+Regla mental para el futuro
+
+“¿Qué estoy buscando realmente?”
+
+Historial → PointsHistory
+
+Usuario → User
+
+Curso → Course
+
+Examen → Exam
+
+El resto es acompañante.
+
+💡 Bonus tip (nivel pro)
+
+Si un método empieza a necesitar muchos JOINs, no cambies de modelo:
+👉 crea métodos como:
+
+findWithUser
+
+getByUser
+
+getWithRelations
+
+Nunca los muevas a otro modelo solo por el JOIN.
+
+
+🧠 Regla definitiva (guárdala 🔐)
+
+Controladores NO deben armar datos
+Modelos SÍ deben saber cómo obtenerlos
+
+El controlador:
+
+valida
+
+decide qué método llamar
+
+devuelve la respuesta
+
+El modelo:
+
+sabe SQL
+
+sabe JOINs
+
+sabe relaciones
+
+
+🧠 Regla mental que ya dominas
+
+La tabla intermedia decide la relación,
+el JOIN conecta,
+el WHERE filtra,
+el SELECT decide qué ves.
+
+
+🧾 Regla mental que ya dominas
+
+ON → cómo se relacionan las tablas
+
+WHERE → qué filas exactas quiero
+
+SELECT → qué datos devuelvo
 ------------------------------
 
 falta los modelos ()
-
-
-
-
 
 FALTA IMPLEMENTAR DE LESSON HACIA ABAJO 

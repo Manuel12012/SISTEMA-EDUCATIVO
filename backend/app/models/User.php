@@ -36,6 +36,19 @@ class User extends Model
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function findByPointHistory($pointstHistoryId)
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            "SELECT ph.*, u.nombre, u.email, u.rol, u.nivel, u.avatar_url
+                    FROM points_history ph
+                    INNER JOIN users u ON ph.user_id = u.id
+                    WHERE ph.id = :id"
+        );
+        $stmt->execute(["id" => $pointstHistoryId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public static function find(int $userId): ?array
     {
         $db = Database::connect();

@@ -73,7 +73,7 @@ class ExamController
 
         if (!$exam) {
             Response::json([
-                "error" => "No se pudo crear la pregunta"
+                "error" => "No se pudo crear el examen"
             ], 500);
         }
 
@@ -140,7 +140,7 @@ class ExamController
         ]);
     }
 
-    public static function getResultByExam($examId){
+    public static function results($examId){
                 if (!is_numeric($examId)) {
             Response::json(
                 [

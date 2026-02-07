@@ -53,9 +53,10 @@ class UserBadge extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "SELECT b.*, ub.obtenido_en
-             FROM badges b
-             INNER JOIN user_badges ub ON b.id = ub.badge_id
-             WHERE ub.user_id = :user_id"
+                FROM badges b
+                INNER JOIN user_badges ub
+                ON b.id = ub.badge_id
+                WHERE ub.user_id = :user_id"
         );
         $stmt->execute(["user_id" => $userId]);
 

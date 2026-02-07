@@ -14,6 +14,18 @@ class Module extends Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+public static function getByLesson(int $lessonId) {
+    $db = Database::connect();
+    $stmt = $db->prepare("
+        SELECT m.*
+        FROM modules m
+        JOIN lessons l ON l.module_id = m.id
+        WHERE l.id = :id
+    ");
+    $stmt->execute(['id' => $lessonId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
     public static function find(int $moduleId)
     {
                 $db = Database::connect();

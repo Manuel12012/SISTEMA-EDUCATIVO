@@ -1,20 +1,19 @@
 <?php
 require_once __DIR__ . '/../models/Badge.php';
-require_once __DIR__ . '/../models/ExamOption.php';
 require_once __DIR__ . '/../core/Response.php';
 
 class BadgeController
 {
     public static function index()
     {
-        $questions = Question::all();
+        $badge = Badge::all();
 
-        if (empty($questions)) {
+        if (empty($badge)) {
             Response::json([
                 "error" => "No se encontro el badge"
-            ], 404);
+            ], 200);
         }
-        Response::json($questions);
+        Response::json($badge);
     }
 
     public static function show($badgeId)
@@ -33,8 +32,7 @@ class BadgeController
             ], 404);
         }
 
-        Response::json([
-            "badge" => $badge]);
+        Response::json($badge);
     }
 
     public static function store($data)
@@ -50,11 +48,10 @@ class BadgeController
             Response::json([
                 "error" => "Datos incompletos"
             ],400);
-            exit;
         }
 
         // llamamos la funcion create y la almacenamos en question
-        $badge = Question::create($data);
+        $badge = Badge::create($data);
 
         // si question no existe entonces decimos que no se pudo crear la pregunta
         if (!$badge) {
