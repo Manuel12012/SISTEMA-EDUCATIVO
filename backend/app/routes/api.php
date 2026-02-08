@@ -1,5 +1,19 @@
 <?php
 
+// REQUIRES A CONTROLLER
+require_once __DIR__ . '/../controllers/BadgeController.php';
+require_once __DIR__ . '/../controllers/CourseController.php';
+require_once __DIR__ . '/../controllers/ExamController.php';
+require_once __DIR__ . '/../controllers/ExamOptionController.php';
+require_once __DIR__ . '/../controllers/ExamResultController.php';
+require_once __DIR__ . '/../controllers/LessonController.php';
+require_once __DIR__ . '/../controllers/ModuleController.php';
+require_once __DIR__ . '/../controllers/PointHistoryController.php';
+require_once __DIR__ . '/../controllers/QuestionController.php';
+require_once __DIR__ . '/../controllers/UserBadgeController.php';
+require_once __DIR__ . '/../controllers/UserController.php';
+
+
 // BADGES
 Router::get('badges', [BadgeController::class, 'index']);
 Router::get('badges/{id}', [BadgeController::class, 'show']);
@@ -76,6 +90,6 @@ Router::get('users/{id}', [UserController::class, 'show']);
 Router::post('users', [UserController::class, 'store']);
 Router::put('users/{id}', [UserController::class, 'update']);
 Router::delete('users/{id}', [UserController::class, 'destroy']);
-Router::get('users/{id}/results', [UserController::class, 'resultsByUser']);
+Router::get('users/{userId}/results', [UserController::class, 'resultsByUser']);
 
 

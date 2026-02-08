@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ .'/../core/Response.php';
-require_once __DIR__ .'/../models/PointsHistory.php';
+require_once __DIR__ .'/../models/PointHistory.php';
 
 
 class PointHistoryController

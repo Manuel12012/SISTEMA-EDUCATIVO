@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../models/Question.php';
 require_once __DIR__ . '/../models/ExamOption.php';
 require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../models/User.php';
+
 
 class UserController
 {
@@ -73,39 +75,41 @@ class UserController
         ]);
     }
 
-    public static function store($data)
-    {
-        if (
-            empty($data["nombre"]) ||
-            empty($data["email"]) ||
-            empty($data["password"]) ||
-            empty($data["rol"]) ||
-            empty($data["nivel"]) ||
-            empty($data["puntos"]) ||
-            empty($data["avatar_url"]) ||
-            empty($data["created_at"])
-        ) {
+public static function store($data)
+{
+    $required = [
+        "nombre",
+        "email",
+        "password",
+        "rol",
+        "nivel",
+        "puntos",
+        "avatar_url"
+    ];
+
+    foreach ($required as $field) {
+        if (!array_key_exists($field, $data)) {
             Response::json([
-                "error" => "Datos incompletos"
+                "error" => "Falta el campo: $field"
             ], 400);
             exit;
         }
-
-        $user = User::create($data);
-
-        if (!$user) {
-            Response::json([
-                "error" => "No se pudo crear el usuario"
-            ]);
-            exit;
-        }
-
-        Response::json([
-            "message" => "Usuario creado",
-            "id" => $user
-        ], 201);
     }
 
+    $user = User::create($data);
+
+    if (!$user) {
+        Response::json([
+            "error" => "No se pudo crear el usuario"
+        ], 500);
+        exit;
+    }
+
+    Response::json([
+        "message" => "Usuario creado",
+        "id" => $user
+    ], 201);
+}
     public static function update($userId, $data)
     {
         if (!is_numeric($userId)) {

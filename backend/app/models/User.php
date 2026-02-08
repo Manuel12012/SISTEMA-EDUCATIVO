@@ -66,9 +66,9 @@ class User extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "INSERT INTO users (nombre, email, password, rol, nivel, puntos,
-             avatar_url, created_at )
+             avatar_url )
                     VALUES (:nombre, :email, :password, :rol, :nivel, :puntos, :avatar_url
-                    , :created_at)"
+                    )"
         );
         $stmt->execute([
             "nombre" => $data["nombre"],
@@ -77,8 +77,7 @@ class User extends Model
             "rol" => $data["rol"],
             "nivel" => $data["nivel"],
             "puntos" => $data["puntos"],
-            "avatar_url" => $data["avatar_url"],
-            "created_at" => $data["created_at"],
+            "avatar_url" => $data["avatar_url"]
         ]);
         // retornamos con lastInsertId porque sera de manera auto_increment
         return (int) $db->lastInsertId();
@@ -90,7 +89,7 @@ class User extends Model
         $stmt = $db->prepare(
             "UPDATE users SET nombre = :nombre, email = :email,
                 password = :password, rol = :rol, nivel = :nivel,
-                puntos = :puntos, avatar_url = :avatar_url, created_at = :created_at
+                puntos = :puntos, avatar_url = :avatar_url
             WHERE id = :id"
         ); // retornamos igual un stmt y lo almacenamos en un array $data y tambien el $questionId
         return $stmt->execute([
@@ -101,7 +100,6 @@ class User extends Model
             "nivel" => $data["nivel"],
             "puntos" => $data["puntos"],
             "avatar_url" => $data["avatar_url"],
-            "created_at" => $data["created_at"],
             "id" => $userId
         ]);
     }

@@ -6,7 +6,7 @@ class ExamResult extends Model
 {
     protected static string $table = 'exam_results';
 
-    public static function getByUser(int $userId)
+    public static function getByUser( $userId)
     {
         $db = Database::connect();
         $stmt = $db->prepare(

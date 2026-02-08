@@ -30,8 +30,8 @@ class Lesson extends Model
     { // $data contiene los datos de la pregunta a insertar
         $db = Database::connect();
         $stmt = $db->prepare(
-            "INSERT INTO lessons (module_id, titulo, tipo, contenido, orden,
-            created_at) VALUES (:module_id, :titulo, :tipo, :contenido , :orden, :created_at)"
+            "INSERT INTO lessons (module_id, titulo, tipo, contenido, orden
+        ) VALUES (:module_id, :titulo, :tipo, :contenido, :orden)"
         );
         $stmt->execute([
             "module_id" => $data["module_id"],
@@ -39,7 +39,6 @@ class Lesson extends Model
             "tipo" => $data["tipo"],
             "contenido" => $data["contenido"],
             "orden" => $data["orden"],
-            "created_at" => $data["created_at"]
         ]);
         // retornamos con lastInsertId porque sera de manera auto_increment
         return (int) $db->lastInsertId();
@@ -50,8 +49,7 @@ class Lesson extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "UPDATE lessons SET module_id = :module_id, titulo = :titulo,
-                tipo = :tipo, contenido = :contenido, orden = :orden,
-                created_at = :created_at WHERE id = :id"
+                tipo = :tipo, contenido = :contenido, orden = :orden WHERE id = :id"
         ); // retornamos igual un stmt y lo almacenamos en un array $data y tambien el $questionId
         return $stmt->execute([
             "module_id" => $data["module_id"],
@@ -59,7 +57,6 @@ class Lesson extends Model
             "tipo" => $data["tipo"],
             "contenido" => $data["contenido"],
             "orden" => $data["orden"],
-            "created_at" => $data["created_at"],
             "id" => $lessonId
         ]);
     }

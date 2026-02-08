@@ -196,6 +196,14 @@ ON → cómo se relacionan las tablas
 WHERE → qué filas exactas quiero
 
 SELECT → qué datos devuelvo
+
+
+
+siempre el api.php osea rutas deben tener sus requires de los controladores
+
+los require de cada controlador son importantes, si falta uno o uno esta de mas , falla todo el postman
+
+siempre deben haber datos en la base de datos sino no tendra sneitdo llamar https URL
 ------------------------------
 
 falta los modelos ()

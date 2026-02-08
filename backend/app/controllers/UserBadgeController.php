@@ -1,7 +1,9 @@
 <?php
 
+require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/UserBadge.php';
 require_once __DIR__ . '/../core/Response.php';
+
 
 class UserBadgeController
 {
