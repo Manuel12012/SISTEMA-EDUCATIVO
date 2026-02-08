@@ -1,17 +1,25 @@
 <?php
 
 require_once __DIR__ . '/../models/UserBadge.php';
-require_once __DIR__ . '/../models/Module.php';
+require_once __DIR__ . '/../core/Response.php';
 
 class UserBadgeController
 {
-
-   public static function indexByUser($userId)
+    public static function indexByUser($userId)
     {
         if (!is_numeric($userId)) {
             Response::json([
                 "error" => "Id de usuario inválido"
-            ]);
+            ], 400);
+            return;
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            Response::json([
+                "error" => "Usuario no encontrado"
+            ], 404);
             return;
         }
 
@@ -24,7 +32,7 @@ class UserBadgeController
     }
 
 
-public static function store($userId, $badgeId)
+    public static function store($userId, $badgeId)
     {
         if (!is_numeric($userId) || !is_numeric($badgeId)) {
             Response::json([
@@ -38,14 +46,14 @@ public static function store($userId, $badgeId)
         if (!$assigned) {
             Response::json([
                 "error" => "El usuario ya tiene este badge"
-            ]);
+            ], 409);
             return;
         }
 
         Response::json([
             "message" => "Badge asignado correctamente"
-        ]);
-    }  
+        ], 201);
+    }
     public static function destroy($userId, $badgeId)
     {
         if (!is_numeric($userId) || !is_numeric($badgeId)) {
@@ -67,5 +75,5 @@ public static function store($userId, $badgeId)
         Response::json([
             "message" => "Badge eliminado correctamente"
         ]);
-    }  
     }
+}

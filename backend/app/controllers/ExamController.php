@@ -18,6 +18,7 @@ class ExamController
             Response::json([
                 "error" => "No se encontro el examen"
             ], 404);
+            return;
         }
         Response::json($exams);
     }
@@ -25,9 +26,11 @@ class ExamController
     public static function show($examId)
     {
         if (!is_numeric($examId)) {
-            Response::json(data: [
+            Response::json( [
                 "error" => "ID de examen invalido"
             ], status: 404);
+                        return;
+
         }
         // traemos un examen mediante su id
         $exam = Exam::find((int)$examId);
@@ -39,6 +42,8 @@ class ExamController
                 ],
                 404
             );
+                        return;
+
         }
         //traemos las preguntas por el id del examen
         $questions = Question::getByExam($examId);
@@ -75,6 +80,8 @@ class ExamController
             Response::json([
                 "error" => "No se pudo crear el examen"
             ], 500);
+                        return;
+
         }
 
         Response::json([
@@ -92,6 +99,8 @@ class ExamController
                 ],
                 400
             );
+                        return;
+
         }
 
         $exam = Exam::find($examId);
@@ -100,6 +109,7 @@ class ExamController
             Response::json([
                 "error" => "Examen no encontrado"
             ], 404);
+            return;
         }
 
         $updated = Exam::update($examId, $data);
@@ -108,6 +118,8 @@ class ExamController
             Response::json([
                 "error" => "No se pudo actualizar el examen"
             ], 404);
+                        return;
+
         }
 
         Response::json([
@@ -123,6 +135,8 @@ class ExamController
                 ],
                 400
             );
+                        return;
+
         }
 
         $exam= Exam::find($examId);
@@ -131,6 +145,8 @@ class ExamController
             Response::json([
                 "error" => "No se pudo encontrar el examen"
             ],404);
+                        return;
+
         }
 
         Exam::delete($examId);

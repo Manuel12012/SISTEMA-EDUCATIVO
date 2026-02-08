@@ -1,7 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../models/Lesson.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ .'/../core/Response.php';
+require_once __DIR__ .'/../models/PointsHistory.php';
 
 
 class PointHistoryController
@@ -12,7 +13,7 @@ class PointHistoryController
         Response::json([
             "error" => "ID de usuario inválido"
         ], 400);
-        exit;
+    return;
     }
 
     // Verificar que el usuario exista
@@ -22,7 +23,7 @@ class PointHistoryController
         Response::json([
             "error" => "Usuario no encontrado"
         ], 404);
-        exit;
+    return;
     }
 
     // Obtener historial de puntos del usuario
@@ -37,16 +38,18 @@ class PointHistoryController
 
     public static function index()
     {
-        $PointHistory = PointsHistory::all();
+        $histories = PointsHistory::all();
 
-        if (empty($lesson)) {
+        if (empty($histories)) {
             Response::json(
                 [
                     "error" => "No se encontro el historial de puntos"
-                ]
+                ],404
             );
+                return;
+
         }
-        Response::json([$PointHistory]);
+        Response::json($histories);
     }
 
     public static function show($pointHistoryId)
@@ -54,21 +57,23 @@ class PointHistoryController
         if (!is_numeric($pointHistoryId)) {
             Response::json(
                 [
-                    "error" => "Id del historial de puntos no encontrada"
+                    "error" => "Id del historial de puntos no valido"
                 ]
             );
+            return;
         }
 
-        $pointHistory = User::findByPointHistory($pointHistoryId);
+        $histories = PointsHistory::find($pointHistoryId);
 
-        if (!$pointHistory) {
+        if (!$histories) {
             Response::json([
-                "error" => "Historial de puntos no encontrada"
+                "error" => "Historial de puntos no encontrado"
             ]);
+            return;
         }
 
         Response::json([
-            "pointHistory" => $pointHistory
+            "pointHistory" => $histories
         ]);
     }
 
@@ -81,14 +86,16 @@ class PointHistoryController
                 ],
                 400
             );
+            return;
         }
 
-        $pointHistory = PointsHistory::find($pointHistoryId);
+        $histories = PointsHistory::find($pointHistoryId);
 
-        if (!$pointHistory) {
+        if (!$histories) {
             Response::json([
                 "error" => "Historial no encontrado"
             ], 404);
+            return;
         }
 
         $updated = PointsHistory::update($pointHistoryId, $data);
@@ -97,6 +104,7 @@ class PointHistoryController
             Response::json([
                 "error" => "No se pudo actualizar"
             ], 500);
+            return;
         }
         Response::json([
             "message" => "Historial de puntos actualizado"
@@ -112,16 +120,25 @@ class PointHistoryController
                 ],
                 400
             );
+            return;
         }
 
-        $pointHistory = Lesson::find($pointHistoryId);
+        $histories = PointsHistory::find($pointHistoryId);
 
-        if (!$pointHistory) {
+        if (!$histories) {
             Response::json([
                 "error" => "No se pudo encontrar el historial"
             ], 404);
+            return;
         }
-        PointsHistory::delete($pointHistoryId);
+        $deleted = PointsHistory::delete($pointHistoryId);
+
+        if(!$deleted){
+            Response::json([
+                "error"=> "No se pudo borrar el historial"
+            ]);
+            return;
+        }
 
         Response::json([
             "message" => "Historial eliminado"

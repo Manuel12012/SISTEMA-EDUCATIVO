@@ -12,6 +12,7 @@ class ExamOptionController
             Response::json([
                 "error" => "No se encontro la opcion de la pregunta"
             ], 404);
+            return;
         }
         Response::json($examOption);
     }
@@ -22,6 +23,7 @@ class ExamOptionController
             Response::json([
                 "error" => "Id de la opcion del examen invalido"
             ], 400);
+            return;
         }
 
         $examOption = ExamOption::find($examOptionId);
@@ -30,84 +32,94 @@ class ExamOptionController
             Response::json([
                 "error" => "Opcion de examen no encontrada"
             ], 404);
+            return;
         }
         Response::json([
             "examOption" => $examOption
         ]);
     }
 
-    public static function store($data){
-        if(
+    public static function store($data)
+    {
+        if (
             empty($data["question_id"]) ||
-            empty($data["opcion"]) 
-        ){
-                        Response::json([
+            empty($data["opcion"])
+        ) {
+            Response::json([
                 "error" => "Datos incompletos"
-            ],400);
+            ], 400);
             exit;
         }
 
         $examOption = ExamOption::create($data);
 
-        if(!$examOption){
-                    Response::json([
+        if (!$examOption) {
+            Response::json([
                 "error" => "No se pudo crear la opcion de la pregunta"
             ], 500);
+            return;
         }
 
-                Response::json([
+        Response::json([
             "message" => "Opcion creada",
             "id" => $examOption
         ], 201);
     }
 
-    public static function update($examOptionId, $data){
-                if (!is_numeric(value: $examOptionId)) {
+    public static function update($examOptionId, $data)
+    {
+        if (!is_numeric( $examOptionId)) {
             Response::json(
                 [
                     "error" => "ID invalido"
                 ],
                 400
             );
+            return;
         }
 
         $examOption = ExamOption::find($examOptionId);
 
-                if (!$examOption) {
+        if (!$examOption) {
             Response::json([
                 "error" => "Opcion no encontrada"
             ], 404);
+            return;
         }
 
         $updated = ExamOption::update($examOptionId, $data);
 
-        if(!$updated){
-                        Response::json([
+        if (!$updated) {
+            Response::json([
                 "error" => "No se pudo actualizar"
             ], 500);
+            return;
         }
 
-                Response::json([
+        Response::json([
             "message" => "Opcion actualizada"
         ]);
     }
 
-    public static function destroy($examOptionId){
-                if (!is_numeric($examOptionId)) {
+    public static function destroy($examOptionId)
+    {
+        if (!is_numeric($examOptionId)) {
             Response::json(
                 [
                     "error" => "ID invalido"
                 ],
                 400
             );
+            return;
         }
 
-        $ExamOption = ExamOption::find($examOptionId);
+        $examOption = ExamOption::find($examOptionId);
 
-                if (!$ExamOption) {
+        if (!$examOption) {
             Response::json([
                 "error" => "No se pudo encontrar la opcion"
             ], 404);
+            return;
         }
 
         ExamOption::delete($examOptionId);

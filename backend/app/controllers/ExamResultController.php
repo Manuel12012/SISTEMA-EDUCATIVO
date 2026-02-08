@@ -14,8 +14,8 @@ class ExamResultController
         if (empty($examResult)) {
             Response::json([
                 "error" => "No se encontro el resultado"
-            ], 404);
-            exit;
+            ], 200);
+            return;
         }
         Response::json($examResult);
     }
@@ -26,6 +26,7 @@ class ExamResultController
             Response::json([
                 "error" => "Id del resultado invalido"
             ], 400);
+                        return;
         }
 
         $examResult = ExamResult::find($examResultId);
@@ -34,12 +35,10 @@ class ExamResultController
             Response::json([
                 "error" => "Resultado no encontrado"
             ], 404);
-            exit;
+            return;
         }
 
-        Response::json([
-            "examResult" => $examResult
-        ]);
+        Response::json($examResult);
     }
 
 
@@ -52,17 +51,16 @@ class ExamResultController
                 ],
                 400
             );
-            exit;
+            return;
         }
 
         $examResult = ExamResult::find($examResultId);
-
 
         if (!$examResult) {
             Response::json([
                 "error" => "Resultado del examen no encontrada"
             ], 404);
-            exit;
+            return;
         }
 
         $updated = ExamResult::update($examResultId, $data);
@@ -71,7 +69,7 @@ class ExamResultController
             Response::json([
                 "error" => "No se pudo actualizar"
             ], 500);
-            exit;
+            return;
         }
 
         Response::json([
@@ -82,14 +80,14 @@ class ExamResultController
     public static function destroy($examResultId)
     {
 
-        if (!is_numeric(value: $examResultId)) {
+        if (!is_numeric($examResultId)) {
             Response::json(
                 [
                     "error" => "ID invalido"
                 ],
                 400
             );
-            exit;
+            return;
         }
 
         $examResult = ExamResult::find($examResultId);
@@ -98,7 +96,7 @@ class ExamResultController
             Response::json([
                 "error" => "No se pudo encontrar el resultado"
             ], 404);
-            exit;
+            return;
         }
 
         ExamResult::delete($examResultId);
@@ -115,7 +113,7 @@ class ExamResultController
             Response::json([
                 "error" => "Id del usuario invalido"
             ], 400);
-            exit;
+            return;
         }
 
         // accedemos al recurso 
@@ -126,14 +124,14 @@ class ExamResultController
             Response::json([
                 "error" => "Usuario no encontrado"
             ], 404);
-            exit;
+            return;
         }
 
         if (!is_numeric($examId)) {
             Response::json([
                 "error" => "Id del examen invalido"
             ], 400);
-            exit;
+            return;
         }
         $exam = Exam::find($examId);
 
@@ -141,7 +139,7 @@ class ExamResultController
             Response::json([
                 "error" => "Examen no encontrado"
             ], 404);
-            exit;
+            return;
         }
 
         $examResult = ExamResult::getByUserAndExam($userId, $examId);
@@ -150,7 +148,7 @@ class ExamResultController
             Response::json([
                 "error" => "No se pudo encontrar el resultado"
             ], 404);
-            exit;
+            return;
         }
 
         Response::json([

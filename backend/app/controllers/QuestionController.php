@@ -13,6 +13,7 @@ class QuestionController
             Response::json([
                 "error" => "No se encontro la pregunta"
             ], 404);
+            return;
         }
         Response::json($questions);
     }
@@ -23,6 +24,7 @@ class QuestionController
             Response::json([
                 "error" => "Id de la pregunta invalido"
             ], 400);
+            return;
         }
 
         $question = Question::find($questionId);
@@ -31,9 +33,11 @@ class QuestionController
             Response::json([
                 "error" => "Pregunta no encontrada"
             ], 404);
+            return;
         }
 
         $examOptions = ExamOption::getByQuestion($questionId);
+
         Response::json([
             "question" => $question,
             "examOptions" => $examOptions
@@ -48,12 +52,12 @@ class QuestionController
         if (
             empty($data["exam_id"]) ||
             empty($data["pregunta"]) ||
-            empty($data["respuesta_correcta"])
+            !isset($data["respuesta_correcta"])
         ) {
             Response::json([
                 "error" => "Datos incompletos"
-            ],400);
-            exit;
+            ], 400);
+            return;
         }
 
         // llamamos la funcion create y la almacenamos en question
@@ -64,6 +68,7 @@ class QuestionController
             Response::json([
                 "error" => "No se pudo crear la pregunta"
             ], 500);
+            return;
         }
 
         // si pasa validacion retornamos un json exitoso 
@@ -82,6 +87,7 @@ class QuestionController
                 ],
                 400
             );
+            return;
         }
 
         // mandamos a llamar al metodo find para actualizarlo en breve
@@ -89,8 +95,9 @@ class QuestionController
 
         if (!$question) {
             Response::json([
-                "error" => "pregunta no encontrada"
+                "error" => "Pregunta no encontrada"
             ], 404);
+            return;
         }
 
         // mandamos a llamar el metodo uptaded para ahora si actualizarlo
@@ -101,6 +108,7 @@ class QuestionController
             Response::json([
                 "error" => "No se pudo actualizar"
             ], 500);
+            return;
         }
 
         // retornamos un mensaje de pregunta actualizada
@@ -118,6 +126,7 @@ class QuestionController
                 ],
                 400
             );
+            return;
         }
         // mandamos a traer la funcion para buscar la pregunta que borraremos
         $question = Question::find($questionId);
@@ -127,11 +136,18 @@ class QuestionController
             Response::json([
                 "error" => "No se pudo encontrar la pregunta"
             ], 404);
+            return;
         }
 
         // mandamos a llamar la funcion delete pero esta vez no lo almacenamos en una variable
-        Question::delete($questionId);
+        $deleted = Question::delete($questionId);
 
+        if (!$deleted) {
+            Response::json([
+                "error" => "No se pudo eliminar la pregunta"
+            ],500);
+            return;
+        }
         Response::json([
             "message" => "Pregunta eliminada"
         ]);

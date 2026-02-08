@@ -44,13 +44,12 @@ Router::put('lessons/{id}', [LessonController::class, 'update']);
 Router::delete('lessons/{id}', [LessonController::class, 'destroy']);
 Router::get('modules/{moduleId}/lessons', [LessonController::class, 'byModule']);
 
-// MODULE
+// MODULES
 Router::get('modules', [ModuleController::class, 'index']);
 Router::get('modules/{id}', [ModuleController::class, 'show']);
 Router::post('modules', [ModuleController::class, 'store']);
 Router::put('modules/{id}', [ModuleController::class, 'update']);
 Router::delete('modules/{id}', [ModuleController::class, 'destroy']);
-Router::get('courses/{courseId}/modules', [ModuleController::class, 'byCourse']);
 
 // POINT HISTORY
 Router::get('point-histories', [PointHistoryController::class, 'index']);

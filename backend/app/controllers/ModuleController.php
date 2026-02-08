@@ -1,17 +1,19 @@
 <?php
 
 require_once __DIR__ . '/../models/Module.php';
+require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../models/Course.php';
+
 
 class ModuleController
 {
-
-    public static function byCourse(int $courseId)
+    public static function byCourse($courseId)
     {
         if (!is_numeric($courseId)) {
             Response::json([
                 "error" => "ID de módulo inválido"
             ], 400);
-            exit;
+            return;
         }
 
         $courses = Course::find($courseId);
@@ -20,7 +22,7 @@ class ModuleController
             Response::json([
                 "error" => "Curso no encontrado"
             ], 404);
-            exit;
+            return;
         }
 
         $modules = Module::getByCourse($courseId);
@@ -30,15 +32,16 @@ class ModuleController
 
     public static function index()
     {
-        $module = Module::all();
+        $modules = Module::all();
 
-        if (empty($module)) {
+        if (empty($modules)) {
             Response::json([
                 "error" => "No se encontro el modulo"
-            ]);
+            ], 404);
+            return;
         }
 
-        Response::json([$module]);
+        Response::json($modules);
     }
 
     public static function show($moduleId)
@@ -46,22 +49,21 @@ class ModuleController
         if (!is_numeric(value: $moduleId)) {
             Response::json(
                 [
-                    "error" => "Id de la leccion no encontrada"
+                    "error" => "Id del modulo invalido"
                 ]
             );
+            return;
         }
 
-        $module = Module::find($moduleId);
+        $modules = Module::find($moduleId);
 
-        if ($module) {
+        if (!$modules) {
             Response::json([
                 "error" => "Modulo no encontrado"
             ]);
+            return;
         }
-
-        Response::json([
-            "module" => $module
-        ]);
+        Response::json($modules);
     }
 
     public static function store($data)
@@ -74,20 +76,21 @@ class ModuleController
             Response::json([
                 "error" => "Datos incompletos"
             ], 400);
-            exit;
+            return;
         }
 
-        $module = Module::create($data);
+        $modules = Module::create($data);
 
-        if (!$module) {
+        if (!$modules) {
             Response::json([
                 "error" => "No se puedo crear el modulo"
             ]);
+            return;
         }
 
         Response::json([
             "message" => "Modulo creado",
-            "id" => $module
+            "id" => $modules
         ], 201);
     }
 
@@ -100,23 +103,26 @@ class ModuleController
                 ],
                 400
             );
+            return;
         }
 
-        $module = Module::find($moduleId);
+        $modules = Module::find($moduleId);
 
 
-        if (!$module) {
+        if (!$modules) {
             Response::json([
                 "error" => "Module no encontrado"
             ], 404);
+            return;
         }
 
-        $updated = Module::update($module, $data);
+        $updated = Module::update($moduleId, $data);
 
         if (!$updated) {
             Response::json([
                 "error" => "No se pudo actualizar"
             ], 500);
+            return;
         }
         Response::json([
             "message" => "Modulo actualizado"
@@ -132,16 +138,26 @@ class ModuleController
                 ],
                 400
             );
+            return;
         }
 
-        $module = Module::find($moduleId);
+        $modules = Module::find($moduleId);
 
-        if (!$module) {
+        if (!$modules) {
             Response::json([
                 "error" => "No se pudo encontrar el modulo"
             ], 404);
+            return;
         }
-        Module::delete($moduleId);
+
+        $deleted = Module::delete($moduleId);
+
+        if (!$deleted) {
+            Response::json([
+                "error" => "No se pudo eliminar el modulo"
+            ]);
+            return;
+        }
 
         Response::json([
             "message" => "Modulo eliminado"

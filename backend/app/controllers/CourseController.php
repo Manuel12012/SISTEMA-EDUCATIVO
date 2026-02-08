@@ -13,8 +13,10 @@ class CourseController
 
         // validacion si existe el curso o no
         if (empty($courses)) {
-            Response::json(["error" => "No Courses found"], 404);
+            Response::json(["error" => "No se encontraron cursos"], 404);
+            return;
         }
+        
         // devolvemos un json pasandole la variable courses
         Response::json($courses);
     }
@@ -27,6 +29,7 @@ class CourseController
             Response::json([
                 "error" => "ID de curso invalido"
             ], 400);
+            return;
         }
         // en la variable course usamos find y le pasamos el id como parametro
         $course = Course::find((int) $id);
@@ -38,6 +41,7 @@ class CourseController
                 ],
                 404
             );
+            exit;
         }
 
         Response::json($course);
@@ -47,9 +51,8 @@ class CourseController
         if (
             empty($data["titulo"]) ||
             empty($data["descripcion"]) ||
-            empty($data["grado"])||
-            empty($data["created_at"])
-        ) {
+            empty($data["grado"])
+                    ) {
             Response::json([
                 "error" => "Datos incompletos"
             ],400);
@@ -62,6 +65,7 @@ class CourseController
             Response::json([
                 "error" => "No se pudo crear el curso"
             ],500);
+            exit;
         }
 
         Response::json([
@@ -75,6 +79,16 @@ class CourseController
                 Response::json([
                     "error" => "ID invalido"
                 ], 400);
+                return;
+        }
+
+        $course = Course::find($courseId);
+
+        if(!$course){
+            Response::json([
+                "error" => "No se encontro el curso"
+            ]);
+            exit;
         }
 
         $updated = Course::update($courseId, $data);
@@ -83,6 +97,7 @@ class CourseController
             Response::json([
                 "error" => "No se pudo actualizar"
             ],500);
+            exit;
         }
 
         Response::json([
@@ -98,14 +113,16 @@ class CourseController
                 ],
                 400
             );
+            exit;
         }
 
-        $course = Course::delete($courseId);
+        $course = Course::find($courseId);
 
         if(!$course){
             Response::json([
                 "error" => "No se pudo encontrar el curso"
             ],404);
+            exit;
         }
 
         Course::delete($courseId);
@@ -124,6 +141,7 @@ class CourseController
                 ],
                 400
             );
+            exit;
         }
         $course = Course::find((int) $courseId);
 
@@ -132,10 +150,12 @@ class CourseController
             Response::json([
                 "error" => "Curso no encontrado"
             ], 404);
+            exit;
         }
         // usamos getByCourse del modelo Module y le pasamos courseId y lo almacenamos en $modules
         $modules = Module::getByCourse((int)$courseId);
 
         Response::json($modules);
     }
+
 }
