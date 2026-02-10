@@ -3,5 +3,4 @@ export interface Badge{
     nombre: string;
     descripcion: string;
     iconoUrl: string;
-    obtenido: boolean;
 }

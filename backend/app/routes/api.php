@@ -45,6 +45,7 @@ Router::delete('exam-options/{id}', [ExamOptionController::class, 'destroy']);
 // EXAM RESULTS
 Router::get('exam-results', [ExamResultController::class, 'index']);
 Router::get('exam-results/{id}', [ExamResultController::class, 'show']);
+// !POSIBLMENTE QUITAR
 Router::post('exam-results', [ExamResultController::class, 'store']);
 Router::put('exam-results/{id}', [ExamResultController::class, 'update']);
 Router::delete('exam-results/{id}', [ExamResultController::class, 'destroy']);
@@ -64,6 +65,8 @@ Router::get('modules/{id}', [ModuleController::class, 'show']);
 Router::post('modules', [ModuleController::class, 'store']);
 Router::put('modules/{id}', [ModuleController::class, 'update']);
 Router::delete('modules/{id}', [ModuleController::class, 'destroy']);
+Router::get('courses/{courseId}/modules', [ModuleController::class, 'byCourse']);
+
 
 // POINT HISTORY
 Router::get('point-histories', [PointHistoryController::class, 'index']);

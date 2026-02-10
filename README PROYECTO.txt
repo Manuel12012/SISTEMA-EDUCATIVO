@@ -198,14 +198,50 @@ WHERE → qué filas exactas quiero
 SELECT → qué datos devuelvo
 
 
-
+OJO:
 siempre el api.php osea rutas deben tener sus requires de los controladores
 
 los require de cada controlador son importantes, si falta uno o uno esta de mas , falla todo el postman
 
 siempre deben haber datos en la base de datos sino no tendra sneitdo llamar https URL
+
+
+Frase perfecta para memorizar
+
+await espera la request, data es el resultado, async lo envuelve en Promise
+
+
+
+👉 Regla de oro:
+
+📦 Respuesta simple → usa el type directo
+
+🧩 Respuesta compuesta → crea un type nuevo
+
+
+🔥 En PRODUCCIÓN REAL se hace así
+
+✔️ Services → comunicación
+✔️ Hooks → estado + lógica
+✔️ Pages → composición
+✔️ Components → presentación
+
+
+🚫 Errores comunes (que tú estás evitando)
+
+❌ API en components
+❌ Lógica mezclada con UI
+❌ Pages gigantes con todo dentro
+❌ Repetir fetch en cada componente
+
+
+7️⃣ Regla de oro (guárdala)
+
+Services saben hablar con la API
+Hooks saben manejar estado y lógica
+Pages saben decidir
+Components saben mostrar
+
+Si respetas eso → proyecto limpio y escalable.
 ------------------------------
 
-falta los modelos ()
-
-FALTA IMPLEMENTAR DE LESSON HACIA ABAJO 
