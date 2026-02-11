@@ -65,5 +65,7 @@ class BadgeController
             "message" => "Badge creada",
             "id" => $badge
         ], 201);
+
+
     }
 }
