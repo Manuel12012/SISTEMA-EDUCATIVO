@@ -10,11 +10,12 @@ import {
     deletePointHistory as deletePointHistoryService,
     getPointByUser
 } from "../services/pointHistory.service";
-import { getBadgesByUser, assignBadge as assignBadgeServices
-    ,removeBadge as removeBadgeServices
- } from "../services/userBadge.service";
+import {
+    getBadgesByUser, assignBadge as assignBadgeServices
+    , removeBadge as removeBadgeServices
+} from "../services/userBadge.service";
 
-
+// TODO: MEJORAR HOOK
 //creamos una funcion useBadges
 export const useGamification = () => {
     // usamos useState y le decimos que sera de tipo Badge[] y lo iniciamos como un array vacio, cabe a recalcar que el estado nunca debe mutar por eso usamos setBadges
@@ -206,7 +207,7 @@ export const useGamification = () => {
 
         } catch (error) {
             setError("Error al asignar badge");
-             throw error;
+            throw error;
 
         } finally {
             setLoading(false);
@@ -226,7 +227,7 @@ export const useGamification = () => {
 
         } catch (error) {
             setError("Error al eliminar badge");
-             throw error;
+            throw error;
 
         } finally {
             setLoading(false);
