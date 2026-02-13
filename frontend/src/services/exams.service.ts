@@ -45,7 +45,7 @@ export const deleteExam = async(id:number): Promise<{message: string}> =>{
         return data;
     }
 
-export const getResultbyExam = async (id:number):Promise <ExamResultResponse> =>{
+export const getResultsByExam = async (id:number):Promise <ExamResultResponse> =>{
     const {data} = await api.get<ExamResultResponse>(`/exams/${id}/results`);
     return data;
 }

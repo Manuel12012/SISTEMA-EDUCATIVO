@@ -28,7 +28,7 @@ export const deleteLesson = async (id: number): Promise<{ message: string }> => 
     return data;
 }
 // como el backend traera varios lessons de un modulo le asignamos corchetes de arreglo
-export const byModule = async(moduleId: number): Promise<Lesson[]> =>{
+export const getLessonsByModule = async(moduleId: number): Promise<Lesson[]> =>{
     const {data} = await api.get<Lesson[]>(`/lessons/${moduleId}/lessons`);
     return data;
 }

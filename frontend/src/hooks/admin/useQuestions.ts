@@ -1,0 +1,107 @@
+import { useState } from "react";
+import type { Question } from "../../types/question";
+import { getQuestionById, getQuestions, createQuestion as createQuestionService, updateQuestion as updateQuestionService, deleteQuestion as deleteQuestionService } from "../../services/questions.service";
+
+
+export const useQuestions = () => {
+    // QUESTIONS
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [question, setQuestion] = useState<Question | null>(null);
+
+    // INTERFAZ DE USUARIO
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // QUESTIONS METHODS
+    const fetchQuestions = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getQuestions();
+            setQuestions(data);
+        } catch (error) {
+            setError("Error al obtener las preguntas");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchQuestionById = async (id: number) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getQuestionById(id);
+            setQuestion(data);
+        } catch (error) {
+            setError("Error al obtener la pregunta");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createQuestion = async (question: Omit<Question, "id">) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await createQuestionService(question);
+            await fetchQuestions();
+            return response;
+        } catch (error) {
+            setError("Error al crear la pregunta");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateQuestion = async (id: number, question: Partial<Question>) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await updateQuestionService(id, question);
+            await fetchQuestions()
+            return response;
+        } catch (error) {
+            setError("Error al actualizar la pregunta");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteQuestion = async (id: number) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await deleteQuestionService(id);
+            await fetchQuestions();
+            return response;
+        } catch (error) {
+            setError("Error al eliminar la pregunta");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    
+    return{
+        questions,
+        question,
+        loading,
+        error,
+
+        fetchQuestions,
+        fetchQuestionById,
+        createQuestion,
+        updateQuestion,
+        deleteQuestion
+    }
+}
