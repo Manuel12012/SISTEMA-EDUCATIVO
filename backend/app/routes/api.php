@@ -95,4 +95,7 @@ Router::put('users/{id}', [UserController::class, 'update']);
 Router::delete('users/{id}', [UserController::class, 'destroy']);
 Router::get('users/{userId}/results', [UserController::class, 'resultsByUser']);
 
+// SUBMIT EXAMS
+Router::post('exams/{id}/submit', [ExamController::class, 'submit']);
+
 

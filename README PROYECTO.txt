@@ -235,6 +235,19 @@ await espera la request, data es el resultado, async lo envuelve en Promise
 ❌ Repetir fetch en cada componente
 
 
+4️⃣ Resumen de tu duda
+
+Payload: { answers: Record<number, number> } → enviamos respuestas en la propiedad answers.
+
+Record<number, number> → tanto la clave como el valor son números.
+
+Clave = questionId
+
+Valor = optionId
+
+Backend devuelve un objeto result → con info de puntaje, correctas, total y puntos.
+
+
 7️⃣ Regla de oro (guárdala)
 
 Services saben hablar con la API

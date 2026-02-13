@@ -1,12 +1,12 @@
 import { useState } from "react"
-import type { User } from "../types/user"
+import type { User } from "../../types/user"
 import {
     getUserById, getUsers, createUser as createUserService,
     updateUser as updateUsersService,
     deleteUser as deleteUserService,
     getResultsByUser
-} from "../services/user.service";
-import type { ExamResult } from "../types/examResult";
+} from "../../services/user.service";
+import type { ExamResult } from "../../types/examResult";
 
 
 export const useUser = () => {

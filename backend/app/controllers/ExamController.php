@@ -26,11 +26,10 @@ class ExamController
     public static function show($examId)
     {
         if (!is_numeric($examId)) {
-            Response::json( [
+            Response::json([
                 "error" => "ID de examen invalido"
             ], status: 404);
-                        return;
-
+            return;
         }
         // traemos un examen mediante su id
         $exam = Exam::find((int)$examId);
@@ -42,8 +41,7 @@ class ExamController
                 ],
                 404
             );
-                        return;
-
+            return;
         }
         //traemos las preguntas por el id del examen
         $questions = Question::getByExam($examId);
@@ -80,8 +78,7 @@ class ExamController
             Response::json([
                 "error" => "No se pudo crear el examen"
             ], 500);
-                        return;
-
+            return;
         }
 
         Response::json([
@@ -99,8 +96,7 @@ class ExamController
                 ],
                 400
             );
-                        return;
-
+            return;
         }
 
         $exam = Exam::find($examId);
@@ -118,8 +114,7 @@ class ExamController
             Response::json([
                 "error" => "No se pudo actualizar el examen"
             ], 404);
-                        return;
-
+            return;
         }
 
         Response::json([
@@ -127,7 +122,8 @@ class ExamController
         ]);
     }
 
-    public static function destroy($examId){
+    public static function destroy($examId)
+    {
         if (!is_numeric($examId)) {
             Response::json(
                 [
@@ -135,18 +131,16 @@ class ExamController
                 ],
                 400
             );
-                        return;
-
+            return;
         }
 
-        $exam= Exam::find($examId);
+        $exam = Exam::find($examId);
 
-        if(!$exam){
+        if (!$exam) {
             Response::json([
                 "error" => "No se pudo encontrar el examen"
-            ],404);
-                        return;
-
+            ], 404);
+            return;
         }
 
         Exam::delete($examId);
@@ -156,8 +150,9 @@ class ExamController
         ]);
     }
 
-    public static function results($examId){
-                if (!is_numeric($examId)) {
+    public static function results($examId)
+    {
+        if (!is_numeric($examId)) {
             Response::json(
                 [
                     "error" => "ID invalido"
@@ -168,11 +163,56 @@ class ExamController
         }
 
         $examResult = ExamResult::getByExam($examId);
-                Response::json([
+        Response::json([
             "examResult" => $examResult
         ]);
     }
-    
+
+    public static function submit($examId, $data)
+    {
+        if (!is_numeric($examId)) {
+            Response::json([
+                "error" => "ID invalido"
+            ], 400);
+            return;
+        }
+
+        if (!isset($_SESSION['user'])) {
+            Response::json([
+                "error" => "No autenticado"
+            ], 401);
+            return;
+        }
+
+        // si el $data viene vacio $answers del modelo o no es un array entonces retornamos respuestas invalidas
+        if (empty($data["answers"]) || !is_array($data["answers"])) {
+            Response::json([
+                "error" => "Respuestas invalidas"
+            ], 400);
+            return;
+        }
+
+        // buscamos el examen por id
+        $exam = Exam::find($examId);
+
+        // si examen no existe
+        if (!$exam) {
+            Response::json([
+                "error" => "Examen no encontrado"
+            ], 404);
+            return;
+        }
+
+        // user id sera igual al usuario que inicio sesion
+        $userId = (int) $_SESSION['user']['id'];
+
+        // llamamos al metodo CreateFromSubmission y le pasamos los 3 argumentos
+        $result = ExamResult::createFromSubmission($examId,$userId,$data["answers"]);
+
+        // respondemos con un json 
+        Response::json([
+            "message" => "Examen enviado correctamente",
+            "result" => $result
+        ], 201);
+    }
 }
-
-

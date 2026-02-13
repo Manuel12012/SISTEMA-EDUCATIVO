@@ -1,22 +1,22 @@
 import { useState } from "react";
-import type { Course } from "../types/course";
+import type { Course } from "../../types/course";
 import {
     getCourseById, getCourses, createCourse as createCourseService
     , updateCourse as updateCourseService
     , deleteCourse as deleteCourseService
-} from "../services/courses.service";
-import type { Module } from "../types/module";
-import type { Lesson } from "../types/lesson";
+} from "../../services/courses.service";
+import type { Module } from "../../types/module";
+import type { Lesson } from "../../types/lesson";
 import {
     getModuleById, getModules, createModule as createModuleService,
     updateModule as updateModuleService, deleteModule as deleteModuleService,
     getModulesByCourse
-} from "../services/modules.service";
+} from "../../services/modules.service";
 import {
     getLessonById, getLessons, createLesson as createLessonService,
     updateLesson as updateLessonService, deleteLesson as deleteLessonService,
     getLessonsByModule
-} from "../services/lessons.service";
+} from "../../services/lessons.service";
 
 
 
@@ -33,7 +33,6 @@ export const useCourses = () => {
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [lesson, setLesson] = useState<Lesson | null>(null);
 
-    // EXAM RESULTS
     // STATES
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

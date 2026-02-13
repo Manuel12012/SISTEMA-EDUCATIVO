@@ -1,19 +1,19 @@
 import { useState } from "react";
-import type { Badge } from "../types/badge";
+import type { Badge } from "../../types/badge";
 // importamos el service de badge
-import { getBadges, getBadgeById, createBadge, } from "../services/badges.service";
-import type { PointHistory } from "../types/pointHistory";
+import { getBadges, getBadgeById, createBadge, } from "../../services/badges.service";
+import type { PointHistory } from "../../types/pointHistory";
 import {
     getPointHistories,
     getPointHistoryById,
     updatePointHistory as UpdatePointHistoryService,
     deletePointHistory as deletePointHistoryService,
     getPointByUser
-} from "../services/pointHistory.service";
+} from "../../services/pointHistory.service";
 import {
     getBadgesByUser, assignBadge as assignBadgeServices
     , removeBadge as removeBadgeServices
-} from "../services/userBadge.service";
+} from "../../services/userBadge.service";
 
 // TODO: MEJORAR HOOK
 //creamos una funcion useBadges
