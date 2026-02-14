@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import ResultsPage from "../pages/ResultsPage";
+import ResultsPage from "../pages/admin/ResultsPage";
 
 export default function AppRoutes() {
   return (

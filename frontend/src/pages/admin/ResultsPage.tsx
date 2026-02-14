@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {useExamResults} from "../hooks/admin/useExamResults";
-import type {ExamResult} from "../types/examResult";
+import {useExamResults} from "../../hooks/admin/useExamResults";
+import type {ExamResult} from "../../types/examResult";
 import {FaEdit, FaTrash, FaSearch, FaRedo} from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";

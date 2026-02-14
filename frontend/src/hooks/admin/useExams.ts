@@ -20,6 +20,7 @@ export const useExams = () => {
 
             const data = await getExams();
             setExams(data);
+            return data;
         } catch (error) {
             setError("Error al obtener los examenes");
             throw error;
@@ -35,6 +36,7 @@ export const useExams = () => {
 
             const data = await getExamById(id);
             setExam(data.exam);
+            return data;
         } catch (error) {
             setError("Error al obtener el examen");
             throw error;
