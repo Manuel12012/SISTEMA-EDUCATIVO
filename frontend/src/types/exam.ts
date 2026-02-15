@@ -4,7 +4,7 @@ export interface Exam{
     id: number;
     course_id: number,
     titulo: string;
-    duracionMinutos: number;
+    duracion_minutos: number;
     preguntas: Question[];
 }
 

@@ -49,17 +49,24 @@ class Exam extends Model
     public static function update($examId, $data)
     {
         $db = Database::connect();
-        $stmt = $db->prepare(
-            "UPDATE exams SET course_id = :course_id , titulo = :titulo, duracion_minutos =
-            :duracion_minutos WHERE id = :id"
-        );
-        return $stmt->execute([
-            "course_id" => $data["course_id"],
-            "titulo" => $data["titulo"],
-            "duracion_minutos" => $data["duracion_minutos"],
-            "id" => $examId
-        ]);
+    // creamos primero array vacio fields
+        $fields = [];
+        // array dpmde id es igual a examId
+        $params = ["id" => $examId]; //5
+
+        // recorremos data como clave valor
+        foreach ($data as $key => $value) { // en el frontend primero se guarda el key y luego el valor
+            // key que es titulo sera igual a titulo
+            $fields[] = "$key = :$key";
+            $params[$key] = $value; //
+        }
+
+        $sql = "UPDATE exams SET " . implode(", ", $fields) . " WHERE id = :id";
+
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($params);
     }
+
 
     public static function delete($examId)
     {

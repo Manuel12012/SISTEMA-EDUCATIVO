@@ -35,7 +35,7 @@ export const useExams = () => {
             setError(null);
 
             const data = await getExamById(id);
-            setExam(data.exam);
+            setExam(data);
             return data;
         } catch (error) {
             setError("Error al obtener el examen");

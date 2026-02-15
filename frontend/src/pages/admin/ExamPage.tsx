@@ -1,7 +1,9 @@
 import {useEffect, useState} from "react";
 import {useExams} from "../../hooks/admin/useExams";
-import type { Exam } from "../../types/exam";
-
+import type {Exam} from "../../types/exam";
+import {FaEdit, FaTrash, FaSearch, FaRedo} from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import {toast} from "react-toastify";
 const ExamPage = () => {
   const {
     exams,
@@ -18,24 +20,21 @@ const ExamPage = () => {
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
 
-
-  const[formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     titulo: "",
     duracion_minutos: 0,
-  }
-  );
+  });
 
   const [displayedExams, setDisplayedExams] = useState<Exam[]>([]);
 
-
-  const handleEditClick = (exam: Exam) =>{
+  const handleEditClick = (exam: Exam) => {
     setEditingResultId(exam.id);
     setFormData({
       titulo: exam.titulo,
-      duracion_minutos: exam.duracionMinutos
+      duracion_minutos: exam.duracion_minutos,
     });
     setIsModalOpen(true);
-  }
+  };
 
   // llamamos a todos los examenes
   useEffect(() => {
@@ -43,25 +42,210 @@ const ExamPage = () => {
   }, []);
 
   // actualizamos los examenes segun cambie el examen
-  useEffect(()=>{
+  useEffect(() => {
     setDisplayedExams(exams);
-  },[exams]);
+  }, [exams]);
 
-if(loading)
-  return(
-    <div className="flex justify-center items-center h-[60vh]">
-      <p className="text-gray-500 animate-pulse">Cargando examenes...</p>
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <p className="text-gray-500 animate-pulse">Cargando examenes...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="p-6">
+        <p className="text-red-500 font-semibold">{error}</p>
+      </div>
+    );
+
+  return (
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-800">
+          Administrador de Examenes
+        </h1>
+        <p className="text-gray-500 text-sm">
+          Visualiza los examenes, actualizalos, eliminalos o crea uno
+        </p>
+      </div>
+
+      <div className="flex gap-2 items-center mb-4">
+        <input
+          type="number"
+          placeholder="Buscar por ID"
+          value={searchId}
+          onChange={(e) =>
+            setSearchId(e.target.value === "" ? "" : Number(e.target.value))
+          }
+          className="border px-2 py-2 rounded w-32"
+        />
+
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={async () => {
+            if (searchId !== "") {
+              const result = await fetchExamById(searchId);
+              if (result) {
+                setDisplayedExams([result]);
+              } else {
+                setDisplayedExams([]);
+              }
+            } else {
+              setDisplayedExams(exams);
+            }
+          }}
+        >
+          <FaSearch />
+        </button>
+
+        <button
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+          onClick={() => {
+            setSearchId("");
+            fetchExams();
+          }}
+        >
+          <FaRedo />
+        </button>
+      </div>
+
+      <div className="bg-white shadow rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+              <tr>
+                <th className="px-6 py-3 text-left">ID</th>
+                <th className="px-6 py-3 text-left">Curso</th>
+                <th className="px-6 py-3 text-left">Titulo</th>
+                <th className="px-6 py-3 text-left">Duracion</th>
+                <th className="px-6 py-3 text-left">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y">
+              {displayedExams.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-gray-400">
+                    No hay examenes registrados
+                  </td>
+                </tr>
+              )}
+              {displayedExams.map((exam) => {
+                return (
+                  <tr key={exam.id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-medium">{exam.id}</td>
+                    <td className="px-6 py-4">{exam.course_id}</td>
+                    <td className="px-6 py-4">{exam.titulo}</td>
+                    <td className="px-6 py-4">
+                      {Math.floor(exam.duracion_minutos / 60)}m{" "}
+                      {exam.duracion_minutos % 60}s
+                    </td>
+                    <td className="px-6 py-4 flex gap-2">
+                      <button
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
+                        onClick={() => handleEditClick(exam)}
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                        onClick={async () => {
+                          try {
+                            await deleteExam(exam.id);
+                            toast.success("Examen eliminado correctamente");
+                          } catch (error) {
+                            console.error(error);
+                            toast.error("Error al eliminar el examen");
+                          }
+                        }}
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {isModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl shadow-lg p-6 w-96 relative">
+                <h2 className="text-xl font-bold mb-4">Editar Examen</h2>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Titulo
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.titulo}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          titulo: String(e.target.value),
+                        })
+                      }
+                      className="border px-3 py-2 rounded w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Duracion
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.duracion_minutos}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          duracion_minutos: Number(e.target.value),
+                        })
+                      }
+                      className="border px-3 py-2 rounded w-full"
+                    />
+                  </div>
+
+                  <div className="flex justify-end mt-6 gap-3">
+                    <button
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                      onClick={async () => {
+                        if (editResultId !== null) {
+                          try {
+                            await updateExam(editResultId, formData);
+                            toast.success("Examen actualizado correctamente");
+                            setIsModalOpen(false);
+                            setEditingResultId(null);
+                          } catch (error) {
+                            console.error(error);
+                            toast.error("Error al actualizar el examen");
+                          }
+                        }
+                      }}
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
-
-if(error)
-  return(
-    <div className="p-6">
-      <p className="text-red-500 font-semibold">{error}</p>
-    </div>
-  );
-
-
 };
 
 export default ExamPage;

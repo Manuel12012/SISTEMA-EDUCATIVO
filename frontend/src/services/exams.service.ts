@@ -20,9 +20,10 @@ export const getExams = async (): Promise<Exam[]> => {
     return data;
 };
 
-export const getExamById = async (id: number): Promise<ExamDetailResponse> => {
+export const getExamById = async (id: number): Promise<Exam> => {
     const { data } = await api.get<ExamDetailResponse>(`/exams/${id}`);
-    return data;
+    const {exam} =  data;
+    return exam;
 };
 
 export const createExam = async (
@@ -35,9 +36,10 @@ export const createExam = async (
 export const updateExam = async (
     id: number,
     exam: Partial<Exam>
-): Promise<{ message: string }> => {
+): Promise<Exam> => {
 
     const { data } = await api.put(`/exams/${id}`, exam);
+    
     return data;
 }
 
