@@ -1,6 +1,6 @@
 import { api } from "./api";
 import type { ExamResult } from "../types/examResult";
-import type { Exam } from "../types/exam";
+import type { Exam, ExamDTOCreate } from "../types/exam";
 import type { SubmitExamResponse } from "../types/submitExam";
 
 export type ExamResultResponse = {
@@ -27,7 +27,7 @@ export const getExamById = async (id: number): Promise<Exam> => {
 };
 
 export const createExam = async (
-    exam: Omit<Exam, "id">
+    exam: ExamDTOCreate
 ): Promise<{ message: string; id: number }> => {
     const { data } = await api.post("/exams", exam);
     return data;

@@ -4,6 +4,8 @@ import type {Exam} from "../../types/exam";
 import {FaEdit, FaTrash, FaSearch, FaRedo} from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
+import {useCourses} from "../../hooks/core/useCourses";
+
 const ExamPage = () => {
   const {
     exams,
@@ -16,11 +18,14 @@ const ExamPage = () => {
     deleteExam,
   } = useExams();
 
+  const {courses, fetchCourses} = useCourses();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
 
   const [formData, setFormData] = useState({
+    course_id: 0,
     titulo: "",
     duracion_minutos: 0,
   });
@@ -30,6 +35,7 @@ const ExamPage = () => {
   const handleEditClick = (exam: Exam) => {
     setEditingResultId(exam.id);
     setFormData({
+      course_id: exam.course_id,
       titulo: exam.titulo,
       duracion_minutos: exam.duracion_minutos,
     });
@@ -39,6 +45,7 @@ const ExamPage = () => {
   // llamamos a todos los examenes
   useEffect(() => {
     fetchExams();
+    fetchCourses();
   }, []);
 
   // actualizamos los examenes segun cambie el examen
@@ -109,6 +116,20 @@ const ExamPage = () => {
         >
           <FaRedo />
         </button>
+        <button
+          className="ml-auto rounded bg-green-400 px-4 py-2 text-white"
+          onClick={() => {
+            setEditingResultId(null); // 👈 importante
+            setFormData({
+              course_id: 0,
+              titulo: "",
+              duracion_minutos: NaN,
+            });
+            setIsModalOpen(true);
+          }}
+        >
+          Crear Examen +
+        </button>
       </div>
 
       <div className="bg-white shadow rounded-xl overflow-hidden">
@@ -174,9 +195,42 @@ const ExamPage = () => {
           {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-lg p-6 w-96 relative">
-                <h2 className="text-xl font-bold mb-4">Editar Examen</h2>
-
+                <h2 className="text-xl font-bold mb-4">
+                  {editResultId !== null ? "Editar Examen" : "Crear Examen"}
+                </h2>
                 <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Curso
+                    </label>
+                    {/* El select es un componente controlado.
+                        El value depende de formData.course_id.
+                        Cuando cambia, setFormData mantiene los demás campos (...formData)
+                        y solo actualiza course_id con el nuevo valor seleccionado. */}
+
+                    <select
+                      value={formData.course_id}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          course_id: Number(e.target.value),
+                        })
+                      }
+                      className="border px-3 py-2 rounded w-full"
+                    >
+                      {/* Opción inicial con valor 0.
+                          Luego recorremos el array courses y creamos un <option>
+                          por cada curso, usando su id como value y su titulo como texto visible. */}
+
+                      <option value={0}>Seleccionar curso</option>
+
+                      {courses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.titulo}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Titulo
@@ -222,16 +276,23 @@ const ExamPage = () => {
                     <button
                       className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
                       onClick={async () => {
-                        if (editResultId !== null) {
-                          try {
+                        try {
+                          if (editResultId !== null) {
+                            // ✏️ EDITAR
                             await updateExam(editResultId, formData);
                             toast.success("Examen actualizado correctamente");
-                            setIsModalOpen(false);
-                            setEditingResultId(null);
-                          } catch (error) {
-                            console.error(error);
-                            toast.error("Error al actualizar el examen");
+                          } else {
+                            // ➕ CREAR
+                            await createExam(formData);
+                            toast.success("Examen creado correctamente");
                           }
+
+                          setIsModalOpen(false);
+                          setEditingResultId(null);
+                          fetchExams();
+                        } catch (error) {
+                          console.error(error);
+                          toast.error("Error al guardar el examen");
                         }
                       }}
                     >

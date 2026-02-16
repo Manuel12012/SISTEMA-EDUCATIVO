@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getExamById, getExams, createExam as createExamService, updateExam as updateExamService, deleteExam as deleteExamService } from "../../services/exams.service";
-import type { Exam } from "../../types/exam";
+import type { Exam, ExamDTOCreate } from "../../types/exam";
 
 
 export const useExams = () => {
@@ -45,7 +45,7 @@ export const useExams = () => {
         }
     };
 
-    const createExam = async (exam: Omit<Exam, "id">) => {
+    const createExam = async (exam: ExamDTOCreate) => {
         try {
             setLoading(true);
             setError(null);
