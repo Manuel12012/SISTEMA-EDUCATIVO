@@ -62,7 +62,7 @@ export const useExams = () => {
         }
     };
 
-    const updateExam = async (id: number, exam: Partial<Exam>) => {
+    const updateExam = async (id: number, exam: ExamDTOCreate) => {
         try {
             setLoading(true);
             setError(null);

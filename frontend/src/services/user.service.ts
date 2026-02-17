@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { User } from "../types/user"
+import type { User, UserDTOCreate } from "../types/user"
 import type { ExamResult } from "../types/examResult";
 
 export const getUsers = async (): Promise<User[]> => {
@@ -12,13 +12,13 @@ export const getUserById = async (id: number): Promise<User> => {
     return data;
 }
 
-export const createUser = async (user: Omit<User, "id">):
+export const createUser = async (user: UserDTOCreate):
     Promise<{ message: string, id: number }> => {
     const { data } = await api.post("/users", user);
     return data;
 }
 
-export const updateUser = async (id: number, user: Partial<User>):
+export const updateUser = async (id: number, user: UserDTOCreate):
     Promise<{ message: string }> => {
     const { data } = await api.put(`/users/${id}`, user);
     return data;

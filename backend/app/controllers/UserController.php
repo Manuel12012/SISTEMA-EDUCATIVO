@@ -70,9 +70,7 @@ class UserController
             exit;
         }
 
-        Response::json([
-            "user" => $user
-        ]);
+       Response::json($user);
     }
 
 public static function store($data)
@@ -82,8 +80,6 @@ public static function store($data)
         "email",
         "password",
         "rol",
-        "nivel",
-        "puntos",
         "avatar_url"
     ];
 

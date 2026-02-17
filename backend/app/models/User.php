@@ -65,9 +65,9 @@ class User extends Model
     { // $data contiene los datos de la pregunta a insertar
         $db = Database::connect();
         $stmt = $db->prepare(
-            "INSERT INTO users (nombre, email, password, rol, nivel, puntos,
+            "INSERT INTO users (nombre, email, password, rol, 
              avatar_url )
-                    VALUES (:nombre, :email, :password, :rol, :nivel, :puntos, :avatar_url
+                    VALUES (:nombre, :email, :password, :rol, :avatar_url
                     )"
         );
         $stmt->execute([
@@ -75,8 +75,6 @@ class User extends Model
             "email" => $data["email"],
             "password" => $data["password"],
             "rol" => $data["rol"],
-            "nivel" => $data["nivel"],
-            "puntos" => $data["puntos"],
             "avatar_url" => $data["avatar_url"]
         ]);
         // retornamos con lastInsertId porque sera de manera auto_increment
@@ -88,17 +86,14 @@ class User extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "UPDATE users SET nombre = :nombre, email = :email,
-                password = :password, rol = :rol, nivel = :nivel,
-                puntos = :puntos, avatar_url = :avatar_url
+                password = :password, rol = :rol, avatar_url = :avatar_url
             WHERE id = :id"
         ); // retornamos igual un stmt y lo almacenamos en un array $data y tambien el $questionId
         return $stmt->execute([
             "nombre" => $data["nombre"],
             "email" => $data["email"],
             "password" => $data["password"],
-            "rol" => $data["rol"],
-            "nivel" => $data["nivel"],
-            "puntos" => $data["puntos"],
+             "rol" => $data["rol"],
             "avatar_url" => $data["avatar_url"],
             "id" => $userId
         ]);

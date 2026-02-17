@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { User } from "../../types/user"
+import type { User, UserDTOCreate } from "../../types/user"
 import {
     getUserById, getUsers, createUser as createUserService,
     updateUser as updateUsersService,
@@ -49,7 +49,7 @@ export const useUser = () => {
         }
     }
 
-    const createUser = async (user: Omit<User, "id" | "created_at">) => {
+    const createUser = async (user: UserDTOCreate) => {
         try {
             setLoading(true);
             setError(null);
@@ -66,7 +66,7 @@ export const useUser = () => {
         }
     }
 
-    const updateUser = async (id: number, user: Partial<User>) => {
+    const updateUser = async (id: number, user: UserDTOCreate) => {
         try {
             setLoading(true);
             setError(null);
