@@ -1,7 +1,7 @@
 // Importamos api de api.ts
 import { api } from "./api";
 // Importamos el type de Course y usamos Course con la firma de cada atributo
-import type { Course } from "../types/course";
+import type { Course, CourseDTOCreate } from "../types/course";
 
 // Creamos una funcion getCourses que se encargara de traerse los cursos GET, le decimos que sera un arreglo
 export const getCourses = async (): Promise<Course[]> => {
@@ -21,7 +21,7 @@ export const getCourseById = async (id: number): Promise<Course> => {
 // Funcion para crear un curso
 export const createCourse = async (
   // omit es para omitir el id, porque al crear el id se creara desde el backend?
-  course: Omit<Course, "id">
+  course: CourseDTOCreate
   // con Promise haremos que luego se muestre message e id? que vienen del backend, en este caso cursos creado correctamente (o algo asi)
 ): Promise<{ message: string; id: number }> => {
   const { data } = await api.post("/courses", course);
@@ -32,7 +32,7 @@ export const createCourse = async (
 export const updateCourse = async (
   id: number,
   //Partial usamos para que acepte algunos campos actualizados y no todos quizas?
-  course: Partial<Course>
+  course: CourseDTOCreate
   // y hacemos una promesa (Promise) que se enviara un mensaje luego de tipo string? "curso actualizado"
 ): Promise<{ message: string }> => {
   const { data } = await api.put(`/courses/${id}`, course);

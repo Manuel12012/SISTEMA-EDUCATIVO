@@ -78,46 +78,48 @@ const ExamPage = () => {
         </p>
       </div>
 
-      <div className="flex gap-2 items-center mb-4">
-        <input
-          type="number"
-          placeholder="Buscar por ID"
-          value={searchId}
-          onChange={(e) =>
-            setSearchId(e.target.value === "" ? "" : Number(e.target.value))
-          }
-          className="border px-2 py-2 rounded w-32"
-        />
-
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={async () => {
-            if (searchId !== "") {
-              const result = await fetchExamById(searchId);
-              if (result) {
-                setDisplayedExams([result]);
-              } else {
-                setDisplayedExams([]);
-              }
-            } else {
-              setDisplayedExams(exams);
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            placeholder="Buscar por ID"
+            value={searchId}
+            onChange={(e) =>
+              setSearchId(e.target.value === "" ? "" : Number(e.target.value))
             }
-          }}
-        >
-          <FaSearch />
-        </button>
+            className="border px-2 py-2 rounded w-32"
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={async () => {
+              if (searchId !== "") {
+                const result = await fetchExamById(searchId);
+                if (result) {
+                  setDisplayedExams([result]);
+                } else {
+                  setDisplayedExams([]);
+                }
+              } else {
+                setDisplayedExams(exams);
+              }
+            }}
+          >
+            <FaSearch />
+          </button>
+
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+            onClick={() => {
+              setSearchId("");
+              fetchExams();
+            }}
+          >
+            <FaRedo />
+          </button>
+        </div>
 
         <button
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-          onClick={() => {
-            setSearchId("");
-            fetchExams();
-          }}
-        >
-          <FaRedo />
-        </button>
-        <button
-          className="ml-auto rounded bg-green-400 px-4 py-2 text-white"
+          className=" rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
           onClick={() => {
             setEditingResultId(null); // 👈 importante
             setFormData({

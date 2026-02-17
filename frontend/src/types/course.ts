@@ -4,8 +4,18 @@ export interface Course{
     id: number;
     titulo: string;
     descripcion: string;
-    grado: "primaria" | "secundaria";
-    imagenUrl?: string; // el ? significa si no existe colocale undefined
+    grado: Grado;
+    imagenUrl: string; // el ? significa si no existe colocale undefined
     modulos?: Module[];
 
 }
+
+
+export interface CourseDTOCreate{
+    titulo: string,
+    descripcion: string,
+    grado: Grado,
+    imagen_url:string,
+}
+
+type Grado = "primaria" | "secundaria";

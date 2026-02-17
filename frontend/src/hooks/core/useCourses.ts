@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Course } from "../../types/course";
+import type { Course, CourseDTOCreate } from "../../types/course";
 import {
     getCourseById, getCourses, createCourse as createCourseService
     , updateCourse as updateCourseService
@@ -64,6 +64,7 @@ export const useCourses = () => {
             const data = await getCourseById(id);
 
             setCourse(data);
+            return data;
         } catch (error) {
             setError("Error al obtener el curso");
             throw error;
@@ -73,7 +74,7 @@ export const useCourses = () => {
         }
     }
 
-    const createCourse = async (CourseData: Omit<Course, "id">) => {
+    const createCourse = async (CourseData: CourseDTOCreate) => {
         try {
             setLoading(true);
             setError(null);
@@ -91,7 +92,7 @@ export const useCourses = () => {
         }
     }
 
-    const updateCourse = async (id: number, payload: Partial<Course>) => {
+    const updateCourse = async (id: number, payload: CourseDTOCreate) => {
         try {
             setLoading(true);
             setError(null);

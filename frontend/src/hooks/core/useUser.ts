@@ -39,6 +39,7 @@ export const useUser = () => {
 
             const data = await getUserById(id);
             setUser(data);
+            return data;
         } catch (error) {
             setError("Error al obtener el usuario");
             throw error;

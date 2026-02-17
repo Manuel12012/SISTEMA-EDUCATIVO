@@ -1,14 +1,13 @@
-import { BrowserRouter } from "react-router-dom";
+import {BrowserRouter} from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
-import { ToastContainer } from "react-toastify";
+import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    
     <BrowserRouter>
       <AppRoutes />
-            <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -20,6 +19,7 @@ function App() {
         pauseOnHover
       />
     </BrowserRouter>
-  );}
+  );
+}
 
-export default App
+export default App;
