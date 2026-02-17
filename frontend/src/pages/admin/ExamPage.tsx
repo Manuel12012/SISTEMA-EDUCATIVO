@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
 import {useExams} from "../../hooks/admin/useExams";
 import type {Exam} from "../../types/exam";
-import {FaEdit, FaTrash, FaSearch, FaRedo} from "react-icons/fa";
+import {FaEdit, FaTrash, FaSearch, FaRedo, FaSave} from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
 import {useCourses} from "../../hooks/core/useCourses";
-
+import { MdCreateNewFolder } from "react-icons/md";
 const ExamPage = () => {
   const {
     exams,
@@ -79,7 +79,23 @@ const ExamPage = () => {
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2 items-center">
+
+
+        <button
+          className=" rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
+          onClick={() => {
+            setEditingResultId(null); // 👈 importante
+            setFormData({
+              course_id: 0,
+              titulo: "",
+              duracion_minutos: NaN,
+            });
+            setIsModalOpen(true);
+          }}
+        > <MdCreateNewFolder size={18} />
+        </button>
+
+                <div className="flex gap-2 items-center">
           <input
             type="number"
             placeholder="Buscar por ID"
@@ -117,21 +133,6 @@ const ExamPage = () => {
             <FaRedo />
           </button>
         </div>
-
-        <button
-          className=" rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
-          onClick={() => {
-            setEditingResultId(null); // 👈 importante
-            setFormData({
-              course_id: 0,
-              titulo: "",
-              duracion_minutos: NaN,
-            });
-            setIsModalOpen(true);
-          }}
-        >
-          Crear Examen +
-        </button>
       </div>
 
       <div className="bg-white shadow rounded-xl overflow-hidden">

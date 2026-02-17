@@ -89,6 +89,7 @@ const handleEditClick = (user: User) => {
             onChange={(e) =>
               setSearchId(e.target.value === "" ? "" : Number(e.target.value))
             }
+            className="border px-2 py-2 rounded w-32"
           />
           {/*BOTON DE BUSCAR */}
 
