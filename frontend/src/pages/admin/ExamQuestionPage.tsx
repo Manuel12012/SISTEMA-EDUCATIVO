@@ -6,6 +6,7 @@ import type {Question} from "../../types/question";
 import {MdCreateNewFolder} from "react-icons/md";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
+import {useExams} from "../../hooks/admin/useExams";
 
 const ExamQuestionsPage = () => {
   const {examId} = useParams();
@@ -27,6 +28,9 @@ const ExamQuestionsPage = () => {
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
 
+  const {exams, fetchExams, fetchExamById} = useExams();
+  const [examTitle, setExamTitle] = useState<string>("");
+
   const [formData, setFormData] = useState({
     pregunta: "",
     correct_option_id: "",
@@ -43,11 +47,16 @@ const ExamQuestionsPage = () => {
     setIsModalOpen(true);
   };
 
-  // traemos las preguntas por id de examen
   useEffect(() => {
-    if (examId) {
-      fetchQuestionsByExam(Number(examId));
-    }
+    if (!examId) return;
+
+    // 1️⃣ Fetch examen por id
+    fetchExamById(Number(examId)).then((exam) => {
+      if (exam) setExamTitle(exam.titulo);
+    });
+
+    // 2️⃣ Fetch preguntas del examen
+    fetchQuestionsByExam(Number(examId));
   }, [examId]);
 
   // use effect para buscar por id
@@ -81,7 +90,9 @@ const ExamQuestionsPage = () => {
         </button>
 
         <div>
-          <h1 className="text-3xl font-bold">Preguntas del Examen {examId}</h1>
+          <h1 className="text-3xl font-bold">
+            Preguntas del Examen: {examTitle || `#${examId}`}
+          </h1>
           <p className="text-gray-500 text-sm">
             CRUD de preguntas relacionadas a este examen
           </p>
@@ -150,8 +161,7 @@ const ExamQuestionsPage = () => {
                 <th className="px-6 py-3 text-left">Pregunta</th>
                 <th className="px-6 py-3 text-left">Opciones</th>
                 <th className="px-6 py-3 text-left">Opcion correcta</th>
-                                <th className="px-6 py-3 text-left">Acciones</th>
-
+                <th className="px-6 py-3 text-left">Acciones</th>
               </tr>
             </thead>
 
@@ -169,7 +179,6 @@ const ExamQuestionsPage = () => {
                   <td className="px-6 py-4">{q.id}</td>
                   <td className="px-6 py-4">{q.pregunta}</td>
 
-
                   <td
                     className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
                     onClick={() =>
@@ -179,7 +188,7 @@ const ExamQuestionsPage = () => {
                     {q.option_count}
                   </td>
                   <td className="px-6 py-4">{q.correct_option_id}</td>
-                                    <td className="px-6 py-4 flex gap-2">
+                  <td className="px-6 py-4 flex gap-2">
                     <button
                       className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
                       onClick={() => handleEditingClick(q)}
