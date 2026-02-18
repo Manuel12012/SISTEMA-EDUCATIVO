@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Question } from "../../types/question";
+import type { Question, QuestionDTOCreate } from "../../types/question";
 import {
     getQuestionById, getQuestions, createQuestion as createQuestionService, updateQuestion as updateQuestionService, deleteQuestion as deleteQuestionService
 } from "../../services/questions.service";
@@ -64,7 +64,7 @@ export const useQuestions = () => {
         }
     };
 
-    const createQuestion = async (question: Omit<Question, "id">) => {
+    const createQuestion = async (question: QuestionDTOCreate) => {
         try {
             setLoading(true);
             setError(null);

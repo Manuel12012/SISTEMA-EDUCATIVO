@@ -43,13 +43,13 @@ class Question extends Model
     { // $data contiene los datos de la pregunta a insertar
         $db = Database::connect();
         $stmt = $db->prepare(
-            "INSERT INTO questions (exam_id, pregunta, respuesta_correcta)
-                    VALUES (:exam_id, :pregunta, :respuesta_correcta)"
+            "INSERT INTO questions (exam_id, pregunta, correct_option_id)
+                    VALUES (:exam_id, :pregunta, :correct_option_id)"
         );
         $stmt->execute([
             "exam_id" => $data["exam_id"],
             "pregunta" => $data["pregunta"],
-            "respuesta_correcta" => $data["respuesta_correcta"]
+            "correct_option_id" => $data["correct_option_id"]
         ]);
         // retornamos con lastInsertId porque sera de manera auto_increment
         return (int) $db->lastInsertId();
@@ -60,13 +60,13 @@ class Question extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "UPDATE questions SET exam_id = :exam_id, pregunta = :pregunta,
-                respuesta_correcta = :respuesta_correcta
+                correct_option_id = :correct_option_id
             WHERE id = :id"
         ); // retornamos igual un stmt y lo almacenamos en un array $data y tambien el $questionId
         return $stmt->execute([
             "exam_id" => $data["exam_id"],
             "pregunta" => $data["pregunta"],
-            "respuesta_correcta" => $data["respuesta_correcta"],
+            "correct_option_id" => $data["correct_option_id"],
             "id" => $questionId
         ]);
     }

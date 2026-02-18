@@ -72,7 +72,7 @@ class QuestionController
         if (
             empty($data["exam_id"]) ||
             empty($data["pregunta"]) ||
-            !isset($data["respuesta_correcta"])
+            !isset($data["correct_option_id"])
         ) {
             Response::json([
                 "error" => "Datos incompletos"

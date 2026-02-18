@@ -21,11 +21,26 @@ class Exam extends Model
 
     public static function getQuestionsByExam($examId)
     {
-        $db = Database::connect();
-        $stmt = $db->prepare("SELECT * FROM questions WHERE exam_id = :exam_id");
-        $stmt->execute(["exam_id" => $examId]);
+       $db = Database::connect();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql = "
+        SELECT 
+            q.id,
+            q.exam_id,
+            q.pregunta,
+            q.correct_option_id,
+            COUNT(eo.id) AS option_count
+        FROM questions q
+        LEFT JOIN exam_options eo 
+            ON eo.question_id = q.id
+        WHERE q.exam_id = :exam_id
+        GROUP BY q.id, q.exam_id, q.pregunta, q.correct_option_id
+    ";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute(['exam_id' => $examId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 

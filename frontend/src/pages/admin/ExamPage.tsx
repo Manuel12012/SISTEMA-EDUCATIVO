@@ -94,7 +94,7 @@ const ExamPage = () => {
             setIsModalOpen(true);
           }}
         >
-          {" "}
+
           <MdCreateNewFolder size={18} />
         </button>
 
@@ -137,7 +137,8 @@ const ExamPage = () => {
           </button>
         </div>
       </div>
-
+      
+      {/* Tabla */}
       <div className="bg-white shadow rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">

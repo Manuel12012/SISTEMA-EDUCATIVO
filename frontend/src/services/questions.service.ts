@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { Question } from "../types/question"
+import type { Question, QuestionDTOCreate } from "../types/question"
 import type { ExamOption } from "../types/examOption";
 
 export const getQuestions = async (): Promise<Question[]> => {
@@ -17,7 +17,7 @@ export const getOptionByQuestions = async(id:number): Promise<ExamOption[]>=>{
     return data;
 }
 
-export const createQuestion = async (question: Omit<Question, "id">):
+export const createQuestion = async (question: QuestionDTOCreate):
     Promise<{ message: string, id: number }> => {
     const { data } = await api.post("/questions", question);
     return data;
