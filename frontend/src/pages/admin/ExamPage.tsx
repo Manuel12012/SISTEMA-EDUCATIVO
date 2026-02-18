@@ -34,16 +34,16 @@ const ExamPage = () => {
   });
 
   const [displayedExams, setDisplayedExams] = useState<Exam[]>([]);
+const handleEditClick = (exam: Exam) => {
+  setEditingResultId(exam.id);
+  setFormData({
+    course_id: exam.course_id, // ✅ ahora sí funciona
+    titulo: exam.titulo,
+    duracion_minutos: exam.duracion_minutos,
+  });
+  setIsModalOpen(true);
+};
 
-  const handleEditClick = (exam: Exam) => {
-    setEditingResultId(exam.id);
-    setFormData({
-      course_id: exam.course_id,
-      titulo: exam.titulo,
-      duracion_minutos: exam.duracion_minutos,
-    });
-    setIsModalOpen(true);
-  };
 
   // llamamos a todos los examenes
   useEffect(() => {
@@ -94,7 +94,6 @@ const ExamPage = () => {
             setIsModalOpen(true);
           }}
         >
-
           <MdCreateNewFolder size={18} />
         </button>
 
@@ -137,7 +136,7 @@ const ExamPage = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Tabla */}
       <div className="bg-white shadow rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -148,8 +147,8 @@ const ExamPage = () => {
                 <th className="px-6 py-3 text-left">Curso</th>
                 <th className="px-6 py-3 text-left">Titulo</th>
                 <th className="px-6 py-3 text-left">Duracion</th>
-                <th className="px-6 py-3 text-left">Acciones</th>
                 <th className="px-6 py-3 text-left">Preguntas</th>
+                <th className="px-6 py-3 text-left">Acciones</th>
               </tr>
             </thead>
 
@@ -165,12 +164,29 @@ const ExamPage = () => {
                 return (
                   <tr key={exam.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4 font-medium">{exam.id}</td>
-                    <td className="px-6 py-4">{exam.course_id}</td>
+
+                    <td className="px-6 py-4">
+                      <div className="bg-blue-700 rounded-xl text-white w-fit px-2 py-1">
+                        {exam.course_titulo}
+                      </div>
+                    </td>
+
                     <td className="px-6 py-4">{exam.titulo}</td>
                     <td className="px-6 py-4">
                       {Math.floor(exam.duracion_minutos / 60)}m{" "}
                       {exam.duracion_minutos % 60}s
                     </td>
+
+                    {/* LE PASAMOS EL ID DEL EXAMEN PARA RENDERIZAR QUESTIONS */}
+                    <td
+                      className="px-6 py-4 text-blue-500 cursor-pointer hover:underline"
+                      onClick={() =>
+                        navigate(`/admin/exams/${exam.id}/questions`)
+                      }
+                    >
+                      {exam.questions_count}
+                    </td>
+
                     <td className="px-6 py-4 flex gap-2">
                       <button
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
@@ -193,15 +209,6 @@ const ExamPage = () => {
                       >
                         <FaTrash />
                       </button>
-                    </td>
-                    {/* LE PASAMOS EL ID DEL EXAMEN PARA RENDERIZAR QUESTIONS */}
-                    <td
-                      className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
-                      onClick={() =>
-                        navigate(`/admin/exams/${exam.id}/questions`)
-                      }
-                    >
-                      {exam.questions_count}
                     </td>
                   </tr>
                 );

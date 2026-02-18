@@ -23,9 +23,12 @@ export const getExams = async (): Promise<Exam[]> => {
 
 export const getExamById = async (id: number): Promise<Exam> => {
     const { data } = await api.get<ExamDetailResponse>(`/exams/${id}`);
-    const { exam } = data;
-    return exam;
+    const { exam, questions } = data;
+
+    // añadimos questions_count directamente
+    return { ...exam, questions_count: questions.length };
 };
+
 
 export const getQuestionsByExam = async (id: number): Promise<Question[]> => {
     const { data } = await api.get<Question[]>(`/exams/${id}/questions`);

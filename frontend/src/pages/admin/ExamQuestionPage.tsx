@@ -148,9 +148,10 @@ const ExamQuestionsPage = () => {
               <tr>
                 <th className="px-6 py-3 text-left">ID</th>
                 <th className="px-6 py-3 text-left">Pregunta</th>
-                <th className="px-6 py-3 text-left">Acciones</th>
                 <th className="px-6 py-3 text-left">Opciones</th>
                 <th className="px-6 py-3 text-left">Opcion correcta</th>
+                                <th className="px-6 py-3 text-left">Acciones</th>
+
               </tr>
             </thead>
 
@@ -168,7 +169,17 @@ const ExamQuestionsPage = () => {
                   <td className="px-6 py-4">{q.id}</td>
                   <td className="px-6 py-4">{q.pregunta}</td>
 
-                  <td className="px-6 py-4 flex gap-2">
+
+                  <td
+                    className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
+                    onClick={() =>
+                      navigate(`/admin/exams/questions/${q.id}/exam-options`)
+                    }
+                  >
+                    {q.option_count}
+                  </td>
+                  <td className="px-6 py-4">{q.correct_option_id}</td>
+                                    <td className="px-6 py-4 flex gap-2">
                     <button
                       className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
                       onClick={() => handleEditingClick(q)}
@@ -186,15 +197,6 @@ const ExamQuestionsPage = () => {
                       <FaTrash />
                     </button>
                   </td>
-                  <td
-                    className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
-                    onClick={() =>
-                      navigate(`/admin/exams/questions/${q.id}/exam-options`)
-                    }
-                  >
-                    {q.option_count}
-                  </td>
-                  <td className="px-6 py-4">{q.correct_option_id}</td>
                 </tr>
               ))}
             </tbody>

@@ -21,9 +21,9 @@ class Exam extends Model
 
     public static function getQuestionsByExam($examId)
     {
-       $db = Database::connect();
+        $db = Database::connect();
 
-    $sql = "
+        $sql = "
         SELECT 
             q.id,
             q.exam_id,
@@ -37,23 +37,40 @@ class Exam extends Model
         GROUP BY q.id, q.exam_id, q.pregunta, q.correct_option_id
     ";
 
-    $stmt = $db->prepare($sql);
-    $stmt->execute(['exam_id' => $examId]);
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['exam_id' => $examId]);
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
     public static function find(int $examId): ?array
     {
         $db = Database::connect();
-        $stmt = $db->prepare(
-            "SELECT * FROM exams WHERE id = :id"
-        );
-        $stmt->execute(["id" => $examId]);
+
+        $sql = "
+SELECT 
+        e.*,
+        c.titulo AS course_titulo,
+        (
+            SELECT COUNT(*) 
+            FROM questions q 
+            WHERE q.exam_id = e.id
+        ) AS question_count
+    FROM exams e
+    LEFT JOIN courses c
+        ON c.id = e.course_id
+    WHERE e.id = :id
+    ";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['id' => $examId]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         return $result ?: null;
     }
+
 
     public static function create($data)
     {
@@ -108,25 +125,28 @@ class Exam extends Model
         $db = Database::connect();
 
         $sql = "
-        SELECT 
-            e.id,
-            e.course_id,
-            e.titulo,
-            e.duracion_minutos,
-            e.created_at,
-            e.created_by,
-            e.activo,
-            COUNT(q.id) AS questions_count
-        FROM exams e
-        LEFT JOIN questions q ON q.exam_id = e.id
-        GROUP BY 
-            e.id,
-            e.course_id,
-            e.titulo,
-            e.duracion_minutos,
-            e.created_at,
-            e.created_by,
-            e.activo
+SELECT 
+    e.id,
+    e.course_id,
+    c.titulo AS course_titulo,
+    e.titulo,
+    e.duracion_minutos,
+    e.created_at,
+    e.created_by,
+    e.activo,
+    COUNT(q.id) AS questions_count
+FROM exams e
+LEFT JOIN courses c ON c.id = e.course_id
+LEFT JOIN questions q ON q.exam_id = e.id
+GROUP BY 
+    e.id,
+    c.titulo,
+    e.titulo,
+    e.duracion_minutos,
+    e.created_at,
+    e.created_by,
+    e.activo;
+
     ";
 
         $stmt = $db->query($sql);
