@@ -2,6 +2,7 @@ import { api } from "./api";
 import type { ExamResult } from "../types/examResult";
 import type { Exam, ExamDTOCreate } from "../types/exam";
 import type { SubmitExamResponse } from "../types/submitExam";
+import type { Question } from "../types/question";
 
 export type ExamResultResponse = {
     examResult: ExamResult[];
@@ -22,8 +23,13 @@ export const getExams = async (): Promise<Exam[]> => {
 
 export const getExamById = async (id: number): Promise<Exam> => {
     const { data } = await api.get<ExamDetailResponse>(`/exams/${id}`);
-    const {exam} =  data;
+    const { exam } = data;
     return exam;
+};
+
+export const getQuestionsByExam = async (id: number): Promise<Question[]> => {
+    const { data } = await api.get<Question[]>(`/exams/${id}/questions`);
+    return data;
 };
 
 export const createExam = async (
@@ -39,7 +45,7 @@ export const updateExam = async (
 ): Promise<Exam> => {
 
     const { data } = await api.put(`/exams/${id}`, exam);
-    
+
     return data;
 }
 

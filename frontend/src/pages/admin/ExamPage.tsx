@@ -1,12 +1,15 @@
 import {useEffect, useState} from "react";
 import {useExams} from "../../hooks/admin/useExams";
 import type {Exam} from "../../types/exam";
-import {FaEdit, FaTrash, FaSearch, FaRedo, FaSave} from "react-icons/fa";
+import {FaEdit, FaTrash, FaSearch, FaRedo} from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
 import {useCourses} from "../../hooks/core/useCourses";
-import { MdCreateNewFolder } from "react-icons/md";
+import {MdCreateNewFolder} from "react-icons/md";
+import {useNavigate} from "react-router-dom";
+
 const ExamPage = () => {
+  const navigate = useNavigate();
   const {
     exams,
     loading,
@@ -79,8 +82,6 @@ const ExamPage = () => {
       </div>
 
       <div className="flex justify-between items-center mb-4">
-
-
         <button
           className=" rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
           onClick={() => {
@@ -92,10 +93,12 @@ const ExamPage = () => {
             });
             setIsModalOpen(true);
           }}
-        > <MdCreateNewFolder size={18} />
+        >
+          {" "}
+          <MdCreateNewFolder size={18} />
         </button>
 
-                <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center">
           <input
             type="number"
             placeholder="Buscar por ID"
@@ -145,6 +148,7 @@ const ExamPage = () => {
                 <th className="px-6 py-3 text-left">Titulo</th>
                 <th className="px-6 py-3 text-left">Duracion</th>
                 <th className="px-6 py-3 text-left">Acciones</th>
+                <th className="px-6 py-3 text-left">Preguntas</th>
               </tr>
             </thead>
 
@@ -188,6 +192,15 @@ const ExamPage = () => {
                       >
                         <FaTrash />
                       </button>
+                    </td>
+                    {/* LE PASAMOS EL ID DEL EXAMEN PARA RENDERIZAR QUESTIONS */}
+                    <td
+                      className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
+                      onClick={() =>
+                        navigate(`/admin/exams/${exam.id}/questions`)
+                      }
+                    >
+                      {exam.questions_count}
                     </td>
                   </tr>
                 );

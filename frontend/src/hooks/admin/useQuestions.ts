@@ -1,6 +1,10 @@
 import { useState } from "react";
 import type { Question } from "../../types/question";
-import { getQuestionById, getQuestions, createQuestion as createQuestionService, updateQuestion as updateQuestionService, deleteQuestion as deleteQuestionService } from "../../services/questions.service";
+import {
+    getQuestionById, getQuestions, createQuestion as createQuestionService, updateQuestion as updateQuestionService, deleteQuestion as deleteQuestionService
+} from "../../services/questions.service";
+
+import { getQuestionsByExam as getQuestionsByExamService } from "../../services/exams.service";
 
 
 export const useQuestions = () => {
@@ -28,6 +32,22 @@ export const useQuestions = () => {
         }
     };
 
+    const fetchQuestionsByExam = async (examId: number) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getQuestionsByExamService(examId);
+            setQuestions(data);
+
+            return data;
+        } catch (error) {
+            setError("Error al obtener las preguntas del examen");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
+    };
     const fetchQuestionById = async (id: number) => {
         try {
             setLoading(true);
@@ -35,6 +55,7 @@ export const useQuestions = () => {
 
             const data = await getQuestionById(id);
             setQuestion(data);
+            return data;
         } catch (error) {
             setError("Error al obtener la pregunta");
             throw error;
@@ -90,9 +111,9 @@ export const useQuestions = () => {
             setLoading(false);
         }
     };
-    
-    
-    return{
+
+
+    return {
         questions,
         question,
         loading,
@@ -102,6 +123,7 @@ export const useQuestions = () => {
         fetchQuestionById,
         createQuestion,
         updateQuestion,
-        deleteQuestion
+        deleteQuestion,
+        fetchQuestionsByExam
     }
 }

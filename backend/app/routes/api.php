@@ -12,6 +12,8 @@ require_once __DIR__ . '/../controllers/PointHistoryController.php';
 require_once __DIR__ . '/../controllers/QuestionController.php';
 require_once __DIR__ . '/../controllers/UserBadgeController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
+require_once __DIR__ . '/../controllers/EnrollmentController.php';
+
 
 
 // BADGES
@@ -28,12 +30,14 @@ Router::delete('courses/{id}', [CourseController::class, 'destroy']);
 Router::get('courses/{id}/modules', [CourseController::class, 'modules']);
 
 // EXAMS
-Router::get('exams', [ExamController::class, 'index']);
+Router::get('exams', [ExamController::class, 'allWithQuestionCount']);
 Router::get('exams/{id}', [ExamController::class, 'show']);
 Router::post('exams', [ExamController::class, 'store']);
 Router::put('exams/{id}', [ExamController::class, 'update']);
 Router::delete('exams/{id}', [ExamController::class, 'destroy']);
 Router::get('exams/{id}/results', [ExamController::class, 'results']);
+Router::get('exams/{id}/questions', [ExamController::class, 'getQuestionsByExam']);
+
 
 // EXAM OPTIONS
 Router::get('exam-options', [ExamOptionController::class, 'index']);
@@ -76,8 +80,9 @@ Router::delete('point-histories/{id}', [PointHistoryController::class, 'destroy'
 Router::get('users/{userId}/point-histories',[PointHistoryController::class, 'byUser']);
 
 // QUESTIONS
-Router::get('questions', [QuestionController::class, 'index']);
+Router::get('questions', [QuestionController::class, 'allWithOptionsCount']);
 Router::get('questions/{id}', [QuestionController::class, 'show']);
+Router::get('questions/{id}/exam-options', [QuestionController::class, 'getOptionsByQuestions']);
 Router::post('questions', [QuestionController::class, 'store']);
 Router::put('questions/{id}', [QuestionController::class, 'update']);
 Router::delete('questions/{id}', [QuestionController::class, 'destroy']);
@@ -97,5 +102,11 @@ Router::get('users/{userId}/results', [UserController::class, 'resultsByUser']);
 
 // SUBMIT EXAMS
 Router::post('exams/{id}/submit', [ExamController::class, 'submit']);
+
+//COURSE ENROLLMENTS
+Router::post('enrollment/user/{userId}/course/{courseId}', [EnrollmentController::class, 'enroll']);
+Router::get('enrollment/user/{userId}', [EnrollmentController::class, 'myCourses']);
+
+
 
 

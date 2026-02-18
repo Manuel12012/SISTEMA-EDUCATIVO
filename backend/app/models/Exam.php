@@ -19,6 +19,16 @@ class Exam extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function getQuestionsByExam($examId)
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare("SELECT * FROM questions WHERE exam_id = :exam_id");
+        $stmt->execute(["exam_id" => $examId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     public static function find(int $examId): ?array
     {
         $db = Database::connect();
@@ -49,7 +59,7 @@ class Exam extends Model
     public static function update($examId, $data)
     {
         $db = Database::connect();
-    // creamos primero array vacio fields
+        // creamos primero array vacio fields
         $fields = [];
         // array dpmde id es igual a examId
         $params = ["id" => $examId]; //5
@@ -76,5 +86,36 @@ class Exam extends Model
         );
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $examId]);
+    }
+
+    public static function allWithQuestionCount()
+    {
+        $db = Database::connect();
+
+        $sql = "
+        SELECT 
+            e.id,
+            e.course_id,
+            e.titulo,
+            e.duracion_minutos,
+            e.created_at,
+            e.created_by,
+            e.activo,
+            COUNT(q.id) AS questions_count
+        FROM exams e
+        LEFT JOIN questions q ON q.exam_id = e.id
+        GROUP BY 
+            e.id,
+            e.course_id,
+            e.titulo,
+            e.duracion_minutos,
+            e.created_at,
+            e.created_by,
+            e.activo
+    ";
+
+        $stmt = $db->query($sql);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

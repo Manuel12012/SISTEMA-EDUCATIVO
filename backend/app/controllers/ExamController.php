@@ -23,6 +23,44 @@ class ExamController
         Response::json($exams);
     }
 
+
+    public static function getQuestionsByExam($examId)
+    {
+
+        if (!is_numeric($examId)) {
+            Response::json(
+                [
+                    "error" => "ID de examen invalido"
+                ],
+                404
+            );
+            return;
+        }
+
+        $getQuestions = Exam::getQuestionsByExam($examId);
+
+        if (!$getQuestions) {
+            Response::json([
+                "error" => "Pregunta no encontrada"
+            ], 404);
+            return;
+        }
+
+        Response::json($getQuestions);
+    }
+    public static function allWithQuestionCount()
+    {
+        $exams = Exam::allWithQuestionCount();
+
+        if (empty($exams)) {
+            Response::json([
+                "error" => "No se encontro el examen"
+            ], 404);
+            return;
+        }
+        Response::json($exams);
+    }
+
     public static function show($examId)
     {
         if (!is_numeric($examId)) {
@@ -207,7 +245,7 @@ class ExamController
         $userId = (int) $_SESSION['user']['id'];
 
         // llamamos al metodo CreateFromSubmission y le pasamos los 3 argumentos
-        $result = ExamResult::createFromSubmission($examId,$userId,$data["answers"]);
+        $result = ExamResult::createFromSubmission($examId, $userId, $data["answers"]);
 
         // respondemos con un json 
         Response::json([

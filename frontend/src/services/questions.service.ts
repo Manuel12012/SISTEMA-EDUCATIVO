@@ -1,5 +1,6 @@
 import { api } from "./api";
 import type { Question } from "../types/question"
+import type { ExamOption } from "../types/examOption";
 
 export const getQuestions = async (): Promise<Question[]> => {
     const { data } = await api.get<Question[]>("/questions");
@@ -8,6 +9,11 @@ export const getQuestions = async (): Promise<Question[]> => {
 
 export const getQuestionById = async (id: number): Promise<Question> => {
     const { data } = await api.get<Question>(`/questions/${id}`);
+    return data;
+}
+
+export const getOptionByQuestions = async(id:number): Promise<ExamOption[]>=>{
+    const {data} = await api.get<ExamOption[]>(`/questions/${id}/exam-options`);
     return data;
 }
 

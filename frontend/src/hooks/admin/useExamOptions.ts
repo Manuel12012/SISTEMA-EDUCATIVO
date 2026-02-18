@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ExamOption } from "../../types/examOption";
 import { getExamOptions, getExamOptionsById, createExamOption as createExamOptionService, updateExamOption as updateExamOptionService, deleteExamOption as deleteExamOptionService } from "../../services/examOptions.service";
+import { getOptionByQuestions } from "../../services/questions.service";
 
 
 export const useExamOptions = () => {
@@ -20,6 +21,7 @@ export const useExamOptions = () => {
 
             const data = await getExamOptions();
             setExamOptions(data);
+            return data;
         } catch (error) {
             setError("Error al obtener las opciones de los examenes");
             throw error;
@@ -27,6 +29,22 @@ export const useExamOptions = () => {
             setLoading(false);
         }
     };
+
+    const fetchOptionsByQuestions = async (id: number) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getOptionByQuestions(id);
+            setExamOptions(data);
+
+            return data;
+        } catch (error) {
+            setError("Error al obtener la opcion del examen");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const fetchExamOptionsById = async (id: number) => {
         try {
@@ -95,7 +113,7 @@ export const useExamOptions = () => {
     };
 
 
-    return{
+    return {
         examOptions,
         examOption,
         loading,
@@ -105,6 +123,7 @@ export const useExamOptions = () => {
         fetchExamOptionsById,
         createExamOption,
         updateExamOption,
-        deleteExamOption
+        deleteExamOption,
+        fetchOptionsByQuestions
     }
 }

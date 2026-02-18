@@ -16,6 +16,17 @@ class Question extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public static function getOptionsByQuestions($questionId)
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            "SELECT * FROM exam_options WHERE question_id = :questionId"
+        );
+        $stmt->execute(["questionId" => $questionId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     public static function find(int $questionId): ?array
     {
         $db = Database::connect();
@@ -68,5 +79,31 @@ class Question extends Model
         );
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $questionId]);
+    }
+
+    public static function allWithOptionsCount()
+    {
+        $db = Database::connect();
+
+        $sql = "
+SELECT 
+    q.id,
+    q.exam_id,
+    q.pregunta,
+    q.correct_option_id,
+    COUNT(eo.id) AS option_count
+FROM questions q
+LEFT JOIN exam_options eo 
+    ON eo.question_id = q.id
+GROUP BY 
+    q.id,
+    q.exam_id,
+    q.pregunta,
+    q.correct_option_id;
+    ";
+
+        $stmt = $db->query($sql);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

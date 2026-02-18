@@ -5,17 +5,37 @@ require_once __DIR__ . '/../core/Response.php';
 
 class QuestionController
 {
-    public static function index()
+        public static function allWithOptionsCount()
     {
-        $questions = Question::all();
+        $options = Question::allWithOptionsCount();
 
-        if (empty($questions)) {
+        if (empty($options)) {
             Response::json([
-                "error" => "No se encontro la pregunta"
+                "error" => "No se encontro el examen"
             ], 404);
             return;
         }
-        Response::json($questions);
+        Response::json($options);
+    }
+
+    public static function getOptionsByQuestions($questionId)
+    {
+        if (!is_numeric($questionId)) {
+            Response::json([
+                "error" => "Id de la pregunta invalido"
+            ], 400);
+            return;
+        }
+
+        $OptionsByQuestion = Question::getOptionsByQuestions($questionId);
+
+        if(!$OptionsByQuestion){
+            Response::json([
+                "error"=> "Opcion no encontrada"
+            ],404);
+        }
+
+        Response::json($OptionsByQuestion);
     }
 
     public static function show($questionId)
@@ -145,7 +165,7 @@ class QuestionController
         if (!$deleted) {
             Response::json([
                 "error" => "No se pudo eliminar la pregunta"
-            ],500);
+            ], 500);
             return;
         }
         Response::json([
