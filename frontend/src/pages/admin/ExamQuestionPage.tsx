@@ -81,22 +81,60 @@ const ExamQuestionsPage = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-gray-300 hover:bg-gray-400 p-2 rounded"
-        >
-          <FaArrowLeft />
-        </button>
+      <div className="flex items-center justify-between">
+        {/* IZQUIERDA: botón + título */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-gray-300 hover:bg-gray-400 px-2 py-2 rounded"
+          >
+            <FaArrowLeft />
+          </button>
 
-        <div>
-          <h1 className="text-3xl font-bold">
-            Preguntas del Examen: {examTitle || `#${examId}`}
-          </h1>
-          <p className="text-gray-500 text-sm">
-            CRUD de preguntas relacionadas a este examen
-          </p>
+          <div>
+            <h1 className="text-3xl font-bold">
+              Preguntas del Examen: {examTitle || `#${examId}`}
+            </h1>
+            <p className="text-gray-500 text-sm">
+              CRUD de preguntas relacionadas a este examen
+            </p>
+          </div>
         </div>
+
+        {/* DERECHA: botón guardar */}
+        <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded">
+          Guardar cambios
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {displayedQuestions.map((q) => (
+          <div key={q.id} className="flex justify-between gap-4 w-full">
+            {/* IZQUIERDA */}
+            <div className="flex flex-col rounded-lg w-1/2 bg-gray-600 px-8 py-5">
+              <p className="rounded text-xl text-white mb-5">Pregunta {q.id}</p>
+              <textarea
+                className="border rounded bg-gray-200 w-full"
+                value={q.pregunta}
+                onChange={(e) =>
+                  setDisplayedQuestions((prev) =>
+                    prev.map((item) =>
+                      item.id === q.id
+                        ? {...item, pregunta: e.target.value}
+                        : item,
+                    ),
+                  )
+                }
+              />
+            </div>
+
+            {/* DERECHA */}
+            <div className="w-1/2 bg-gray-200 p-4 rounded">
+              <p>Contenido adicional</p>
+              {/* aquí puedes poner botones, select, info, etc */}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="flex justify-between items-center mb-4">
@@ -154,63 +192,6 @@ const ExamQuestionsPage = () => {
       {/* Tabla */}
       <div className="bg-white shadow rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
-              <tr>
-                <th className="px-6 py-3 text-left">ID</th>
-                <th className="px-6 py-3 text-left">Pregunta</th>
-                <th className="px-6 py-3 text-left">Opciones</th>
-                <th className="px-6 py-3 text-left">Opcion correcta</th>
-                <th className="px-6 py-3 text-left">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y">
-              {displayedQuestions.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="text-center py-8 text-gray-400">
-                    No hay preguntas registradas
-                  </td>
-                </tr>
-              )}
-
-              {displayedQuestions.map((q) => (
-                <tr key={q.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4">{q.id}</td>
-                  <td className="px-6 py-4">{q.pregunta}</td>
-
-                  <td
-                    className="px-6 py-4 text-blue-600 cursor-pointer hover:underline"
-                    onClick={() =>
-                      navigate(`/admin/exams/questions/${q.id}/exam-options`)
-                    }
-                  >
-                    {q.option_count}
-                  </td>
-                  <td className="px-6 py-4">{q.correct_option_id}</td>
-                  <td className="px-6 py-4 flex gap-2">
-                    <button
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
-                      onClick={() => handleEditingClick(q)}
-                    >
-                      <FaEdit />
-                    </button>
-
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                      onClick={async () => {
-                        await deleteQuestion(q.id);
-                        await fetchQuestionsByExam(Number(examId));
-                      }}
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
           {isModalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-lg p-6 w-96 relative">
