@@ -31,7 +31,10 @@ const ExamQuestionsPage = () => {
   const [opcionesVisibles, setOpcionesVisibles] = useState<Set<number>>(
     new Set(),
   );
-
+  const [mostrarFormNuevaOpcion, setMostrarFormNuevaOpcion] = useState<
+    Set<number>
+  >(new Set());
+  const [nuevaOpcion, setNuevaOpcion] = useState<Record<number, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
@@ -39,6 +42,10 @@ const ExamQuestionsPage = () => {
   const {exams, fetchExams, fetchExamById} = useExams();
   const [examTitle, setExamTitle] = useState<string>("");
   const [opcionesPorPregunta, setOpcionesPorPregunta] = useState<
+    Record<number, ExamOption[]>
+  >({});
+
+  const [opcionesEditables, setOpcionesEditables] = useState<
     Record<number, ExamOption[]>
   >({});
 
@@ -245,13 +252,19 @@ const ExamQuestionsPage = () => {
                     try {
                       if (!opcionesPorPregunta[q.id]) {
                         const options = await fetchOptionsByQuestions(q.id);
-
-                        if (options) {
-                          setOpcionesPorPregunta((prev) => ({
-                            ...prev,
-                            [q.id]: options,
-                          }));
-                        }
+                        setOptionData({
+                          question_id: q.id,
+                          opcion: "",
+                          orden: (options?.length ?? 0) + 1,
+                        });
+                        setOpcionesPorPregunta((prev) => ({
+                          ...prev,
+                          [q.id]: options ?? [],
+                        }));
+                        setOpcionesEditables((prev) => ({
+                          ...prev,
+                          [q.id]: options ?? [],
+                        }));
                       }
                       setOpcionesVisibles((prev) => new Set(prev).add(q.id));
                     } catch (error) {
@@ -281,55 +294,122 @@ const ExamQuestionsPage = () => {
                   {opcionesPorPregunta[q.id]?.map((opt) => (
                     <div
                       key={opt.id}
-                      className={`flex justify-between items-center border rounded p-2 mb-2 ${
-                        q.correct_option_id === opt.id
-                          ? "bg-green-100 border-green-400"
-                          : "bg-gray-50"
-                      }`}
+                      className={`flex justify-between items-center border rounded p-2 mb-2 ...`}
                     >
-                      
                       <input
-                      value={opt.opcion}
-                      onChange={(e)=>{
-                        setDisplayedOptions((prev)=>
-                        prev.map((item)=>
-                        item.id == o))
-                      }}
+                        type="text"
+                        value={
+                          opcionesEditables[q.id]?.find((o) => o.id === opt.id)
+                            ?.opcion ?? ""
+                        }
+                        onChange={(e) =>
+                          setOpcionesEditables((prev) => ({
+                            ...prev,
+                            [q.id]: prev[q.id].map((o) =>
+                              o.id === opt.id
+                                ? {...o, opcion: e.target.value}
+                                : o,
+                            ),
+                          }))
+                        }
+                        className="border rounded px-2 py-1 text-sm w-1/2"
                       />
 
-                      <div className="flex gap-3 text-sm text-gray-500">
-                        <span>Orden: {opt.orden}</span>
+                      <input
+                        type="number"
+                        value={
+                          opcionesEditables[q.id]?.find((o) => o.id === opt.id)
+                            ?.orden ?? 0
+                        }
+                        onChange={(e) =>
+                          setOpcionesEditables((prev) => ({
+                            ...prev,
+                            [q.id]: prev[q.id].map((o) =>
+                              o.id === opt.id
+                                ? {...o, orden: Number(e.target.value)}
+                                : o,
+                            ),
+                          }))
+                        }
+                        className="border rounded px-2 py-1 text-sm w-16"
+                      />
 
-                        {q.correct_option_id === opt.id && (
-                          <span className="text-green-600 font-semibold">
-                            Correcta
-                          </span>
-                        )}
-                      </div>
+                      {q.correct_option_id === opt.id && (
+                        <span className="text-green-600 font-semibold text-sm">
+                          Correcta
+                        </span>
+                      )}
                     </div>
                   ))}
 
-                    
-                  <div>
-                    hola
-                  </div>
                   <div className="flex justify-center bg-blue-500 rounded">
                     <button
-                      onClick={async () => {
-                        try {
-                          await createExamOption(optionData);
-                          toast.success("Opcion creada exitosamente!");
-                        } catch (error) {
-                          console.error(error);
-                          toast.success("No se pudo crear la opcion");
-                        }
+                      onClick={() => {
+                        setMostrarFormNuevaOpcion((prev) => {
+                          const next = new Set(prev);
+                          prev.has(q.id) ? next.delete(q.id) : next.add(q.id);
+                          return next;
+                        });
                       }}
-                      className=" cursor-pointer text-white px-4 py-2  text-sm"
+                      className="cursor-pointer text-white px-4 py-2 text-sm"
                     >
-                      {" "}
-                      + Agregar opciones
+                      + Agregar opción
                     </button>
                   </div>
+                </div>
+              )}
+
+              {mostrarFormNuevaOpcion.has(q.id) && (
+                <div className="flex gap-2 items-center border rounded p-2 mt-2 bg-yellow-50">
+                  <input
+                    type="text"
+                    placeholder="Nueva opción..."
+                    value={nuevaOpcion[q.id] ?? ""}
+                    onChange={(e) =>
+                      setNuevaOpcion((prev) => ({
+                        ...prev,
+                        [q.id]: e.target.value,
+                      }))
+                    }
+                    className="border rounded px-2 py-1 text-sm w-1/2"
+                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        await createExamOption({
+                          question_id: q.id,
+                          opcion: nuevaOpcion[q.id] ?? "",
+                          orden: (opcionesPorPregunta[q.id]?.length ?? 0) + 1,
+                        });
+
+                        // refrescar opciones
+                        const updated = await fetchOptionsByQuestions(q.id);
+                        setOpcionesPorPregunta((prev) => ({
+                          ...prev,
+                          [q.id]: updated ?? [],
+                        }));
+                        setOpcionesEditables((prev) => ({
+                          ...prev,
+                          [q.id]: updated ?? [],
+                        }));
+
+                        // limpiar y ocultar form
+                        setNuevaOpcion((prev) => ({...prev, [q.id]: ""}));
+                        setMostrarFormNuevaOpcion((prev) => {
+                          const next = new Set(prev);
+                          next.delete(q.id);
+                          return next;
+                        });
+
+                        toast.success("Opción creada exitosamente!");
+                      } catch (error) {
+                        toast.error("No se pudo crear la opción");
+                      }
+                    }}
+                    className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Guardar
+                  </button>
                 </div>
               )}
             </div>
