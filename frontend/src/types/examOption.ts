@@ -4,3 +4,9 @@ export interface ExamOption{
     opcion: string;
     orden: null;
 }
+
+export interface ExamOptionDTOCreate{
+    question_id: number,
+    opcion: string,
+    orden: number
+}

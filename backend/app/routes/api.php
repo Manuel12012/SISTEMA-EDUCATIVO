@@ -45,6 +45,8 @@ Router::get('exam-options/{id}', [ExamOptionController::class, 'show']);
 Router::post('exam-options', [ExamOptionController::class, 'store']);
 Router::put('exam-options/{id}', [ExamOptionController::class, 'update']);
 Router::delete('exam-options/{id}', [ExamOptionController::class, 'destroy']);
+Router::get('exam-options/question/{id}', [ExamOptionController::class, 'getByQuestion']);
+
 
 // EXAM RESULTS
 Router::get('exam-results', [ExamResultController::class, 'index']);

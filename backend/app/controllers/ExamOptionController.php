@@ -68,7 +68,7 @@ class ExamOptionController
 
     public static function update($examOptionId, $data)
     {
-        if (!is_numeric( $examOptionId)) {
+        if (!is_numeric($examOptionId)) {
             Response::json(
                 [
                     "error" => "ID invalido"
@@ -127,5 +127,23 @@ class ExamOptionController
         Response::json([
             "message" => "Opcion eliminada"
         ]);
+    }
+
+    public static function getByQuestion($questionId)
+    {
+        if (!is_numeric($questionId)) {
+            Response::json([
+                "error" => "ID de pregunta invalido"
+            ], 400);
+            return;
+        }
+
+        $options = ExamOption::getByQuestion((int)$questionId);
+        if (empty($options)) {
+            Response::json([]);
+            return;
+        }
+
+        Response::json($options);
     }
 }

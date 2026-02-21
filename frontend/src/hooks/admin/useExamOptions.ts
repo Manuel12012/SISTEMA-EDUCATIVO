@@ -1,7 +1,11 @@
 import { useState } from "react";
-import type { ExamOption } from "../../types/examOption";
-import { getExamOptions, getExamOptionsById, createExamOption as createExamOptionService, updateExamOption as updateExamOptionService, deleteExamOption as deleteExamOptionService } from "../../services/examOptions.service";
-import { getOptionByQuestions } from "../../services/questions.service";
+import type { ExamOption, ExamOptionDTOCreate } from "../../types/examOption";
+import {
+    getExamOptions, getExamOptionsById, createExamOption as createExamOptionService, updateExamOption as updateExamOptionService, deleteExamOption as deleteExamOptionService,
+    getExamOptionsByQuestion as getExamOptionsByQuestionService
+} from "../../services/examOptions.service";
+import type { ExamDTOCreate } from "../../types/exam";
+
 
 
 export const useExamOptions = () => {
@@ -30,21 +34,25 @@ export const useExamOptions = () => {
         }
     };
 
-    const fetchOptionsByQuestions = async (id: number) => {
+    const fetchOptionsByQuestions = async (
+        id: number
+    ): Promise<ExamOption[]> => {
         try {
             setLoading(true);
             setError(null);
 
-            const data = await getOptionByQuestions(id);
+            const data = await getExamOptionsByQuestionService(id);
             setExamOptions(data);
 
             return data;
         } catch (error) {
             setError("Error al obtener la opcion del examen");
+            throw error; // 🔥 IMPORTANTE
         } finally {
             setLoading(false);
         }
-    }
+    };
+
 
     const fetchExamOptionsById = async (id: number) => {
         try {
@@ -53,6 +61,7 @@ export const useExamOptions = () => {
 
             const data = await getExamOptionsById(id);
             setExamOption(data);
+            return data;
         } catch (error) {
             setError("Error al obtener la opcion del examen");
             throw error;
@@ -61,7 +70,7 @@ export const useExamOptions = () => {
         }
     };
 
-    const createExamOption = async (examOption: Omit<ExamOption, "id">) => {
+    const createExamOption = async (examOption: ExamOptionDTOCreate) => {
         try {
             setLoading(true);
             setError(null);

@@ -7,6 +7,9 @@ import {MdCreateNewFolder} from "react-icons/md";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
 import {useExams} from "../../hooks/admin/useExams";
+import type {ExamOption} from "../../types/examOption";
+import {useExamOptions} from "../../hooks/admin/useExamOptions";
+import {getExamOptionsById} from "../../services/examOptions.service";
 
 const ExamQuestionsPage = () => {
   const {examId} = useParams();
@@ -24,20 +27,38 @@ const ExamQuestionsPage = () => {
     fetchQuestionsByExam,
   } = useQuestions();
 
+  //estado para la visibilidad
+  const [opcionesVisibles, setOpcionesVisibles] = useState<Set<number>>(
+    new Set(),
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
 
   const {exams, fetchExams, fetchExamById} = useExams();
   const [examTitle, setExamTitle] = useState<string>("");
+  const [opcionesPorPregunta, setOpcionesPorPregunta] = useState<
+    Record<number, ExamOption[]>
+  >({});
 
-  const [formData, setFormData] = useState({
-    pregunta: "",
-    correct_option_id: "",
-  });
-
+  const {fetchOptionsByQuestions, createExamOption} = useExamOptions();
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
 
+  // crear question DATA
+  const [formData, setFormData] = useState({
+    pregunta: "",
+    correct_option_id: 0,
+  });
+
+  // crear options DATA
+  const [optionData, setOptionData] = useState({
+    question_id: 0,
+    opcion: "",
+    orden: 0,
+  });
+
+  // funciones de botones
   const handleEditingClick = (question: Question) => {
     setEditingResultId(question.id);
     setFormData({
@@ -101,42 +122,38 @@ const ExamQuestionsPage = () => {
           </div>
         </div>
 
-        {/* DERECHA: botón guardar */}
-        <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded">
+        {/* Botón guardar cambios */}
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
+          onClick={async () => {
+            if (!examId) return;
+
+            try {
+              const examIdNumber = Number(examId);
+
+              // Solo actualizamos las preguntas existentes
+              const updates = displayedQuestions.map((q) => {
+                return updateQuestion(q.id, {
+                  exam_id: examIdNumber,
+                  pregunta: q.pregunta,
+                  correct_option_id: q.correct_option_id,
+                });
+              });
+
+              await Promise.all(updates); // Esperamos a que todas terminen
+              toast.success("Todas las preguntas actualizadas correctamente");
+
+              // Refrescamos la lista desde el backend
+              fetchQuestionsByExam(examIdNumber);
+            } catch (err) {
+              console.error(err);
+              toast.error("Error al actualizar las preguntas");
+            }
+          }}
+        >
           Guardar cambios
         </button>
       </div>
-
-      <div className="flex flex-col gap-4">
-        {displayedQuestions.map((q) => (
-          <div key={q.id} className="flex justify-between gap-4 w-full">
-            {/* IZQUIERDA */}
-            <div className="flex flex-col rounded-lg w-1/2 bg-gray-600 px-8 py-5">
-              <p className="rounded text-xl text-white mb-5">Pregunta {q.id}</p>
-              <textarea
-                className="border rounded bg-gray-200 w-full"
-                value={q.pregunta}
-                onChange={(e) =>
-                  setDisplayedQuestions((prev) =>
-                    prev.map((item) =>
-                      item.id === q.id
-                        ? {...item, pregunta: e.target.value}
-                        : item,
-                    ),
-                  )
-                }
-              />
-            </div>
-
-            {/* DERECHA */}
-            <div className="w-1/2 bg-gray-200 p-4 rounded">
-              <p>Contenido adicional</p>
-              {/* aquí puedes poner botones, select, info, etc */}
-            </div>
-          </div>
-        ))}
-      </div>
-
       <div className="flex justify-between items-center mb-4">
         <button
           className="rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
@@ -144,7 +161,7 @@ const ExamQuestionsPage = () => {
             setEditingResultId(null);
             setFormData({
               pregunta: "",
-              correct_option_id: "",
+              correct_option_id: 0,
             });
             setIsModalOpen(true);
           }}
@@ -189,6 +206,178 @@ const ExamQuestionsPage = () => {
         </div>
       </div>
 
+      <div className="flex flex-col gap-4">
+        {displayedQuestions.map((q) => (
+          <div key={q.id} className="flex justify-between gap-5 w-full">
+            {/* IZQUIERDA */}
+            <div className="flex flex-col rounded w-3/4 bg-gray-200 px-8 py-5 gap-3">
+              <p className="rounded text-xl text-black">Pregunta {q.id}</p>
+              <textarea
+                className="border rounded bg-white w-full"
+                value={q.pregunta}
+                onChange={(e) =>
+                  setDisplayedQuestions((prev) =>
+                    prev.map((item) =>
+                      item.id === q.id
+                        ? {...item, pregunta: e.target.value}
+                        : item,
+                    ),
+                  )
+                }
+              />
+
+              <div>
+                <button
+                  className="cursor-pointer bg-green-400 rounded text-white px-4 py-2 text-sm"
+                  onClick={async () => {
+                    // si ya esta visible solo ocultamos
+
+                    if (opcionesVisibles.has(q.id)) {
+                      setOpcionesVisibles((prev) => {
+                        const next = new Set(prev);
+                        next.delete(q.id);
+                        return next;
+                      });
+                      return;
+                    }
+
+                    // si no estan cargadas hacemos fetch a options
+                    try {
+                      if (!opcionesPorPregunta[q.id]) {
+                        const options = await fetchOptionsByQuestions(q.id);
+
+                        if (options) {
+                          setOpcionesPorPregunta((prev) => ({
+                            ...prev,
+                            [q.id]: options,
+                          }));
+                        }
+                      }
+                      setOpcionesVisibles((prev) => new Set(prev).add(q.id));
+                    } catch (error) {
+                      console.error(error);
+                      toast.error("Error al traer opciones");
+                    }
+                  }}
+                >
+                  {opcionesVisibles.has(q.id)
+                    ? "Ocultar opciones"
+                    : "Mostrar opciones"}
+                </button>
+              </div>
+
+              {opcionesVisibles.has(q.id) && (
+                <div className="mt-4 bg-white rounded p-4 shadow-sm">
+                  <h3 className="font-semibold mb-2 text-gray-700">
+                    Opciones:
+                  </h3>
+
+                  {opcionesPorPregunta[q.id]?.length === 0 && (
+                    <p className="text-gray-400 text-sm">
+                      No hay opciones registradas
+                    </p>
+                  )}
+
+                  {opcionesPorPregunta[q.id]?.map((opt) => (
+                    <div
+                      key={opt.id}
+                      className={`flex justify-between items-center border rounded p-2 mb-2 ${
+                        q.correct_option_id === opt.id
+                          ? "bg-green-100 border-green-400"
+                          : "bg-gray-50"
+                      }`}
+                    >
+                      
+                      <input
+                      value={opt.opcion}
+                      onChange={(e)=>{
+                        setDisplayedOptions((prev)=>
+                        prev.map((item)=>
+                        item.id == o))
+                      }}
+                      />
+
+                      <div className="flex gap-3 text-sm text-gray-500">
+                        <span>Orden: {opt.orden}</span>
+
+                        {q.correct_option_id === opt.id && (
+                          <span className="text-green-600 font-semibold">
+                            Correcta
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                    
+                  <div>
+                    hola
+                  </div>
+                  <div className="flex justify-center bg-blue-500 rounded">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await createExamOption(optionData);
+                          toast.success("Opcion creada exitosamente!");
+                        } catch (error) {
+                          console.error(error);
+                          toast.success("No se pudo crear la opcion");
+                        }
+                      }}
+                      className=" cursor-pointer text-white px-4 py-2  text-sm"
+                    >
+                      {" "}
+                      + Agregar opciones
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* DERECHA */}
+            <div className="w-1/4 bg-gray-200 p-4 rounded flex flex-col gap-3">
+              {/* aquí puedes poner botones, select, info, etc */}
+
+              <div className="flex flex-col gap-2">
+                <label>Tipo de Pregunta</label>
+                <div>
+                  <select name="" id="">
+                    <option value="">-- Seleccione tipo ---</option>
+                    <option value="">Seleccion multiple</option>
+                    <option value="">Seleccion Unica</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="">
+                <label className="">Puntos</label>
+                <div className="flex gap-5">
+                  <input type="text" placeholder="Puntos" />
+                  <p>Ptos</p>
+                </div>
+              </div>
+
+              <div>
+                <button
+                  className="cursor-pointer bg-red-500 text-white rounded-lg px-4 py-2"
+                  onClick={async () => {
+                    try {
+                      await deleteQuestion(q.id);
+                      toast.success("Pregunta eliminada correctamente");
+                    } catch (error) {
+                      console.error(error);
+                      toast.error("Error al eliminar la pregunta");
+                    }
+                  }}
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Tabla */}
       <div className="bg-white shadow rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -228,7 +417,7 @@ const ExamQuestionsPage = () => {
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          correct_option_id: String(e.target.value),
+                          correct_option_id: Number(e.target.value),
                         })
                       }
                       className="border px-3 py-2 rounded w-full"
@@ -261,7 +450,7 @@ const ExamQuestionsPage = () => {
                               exam_id: Number(examId), // <-- aquí usamos el ID del examen
                               pregunta: formData.pregunta,
                               correct_option_id:
-                                formData.correct_option_id || "", // si agregas campo respuesta_correcta
+                                formData.correct_option_id || 0, // si agregas campo respuesta_correcta
                             });
                             toast.success("Pregunta creada correctamente");
                           }
