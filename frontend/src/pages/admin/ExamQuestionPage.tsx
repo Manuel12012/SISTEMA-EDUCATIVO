@@ -1,7 +1,8 @@
+// Importaciones
 import {useEffect, useState} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import {useQuestions} from "../../hooks/admin/useQuestions";
-import {FaArrowLeft, FaTrash, FaEdit, FaRedo, FaSearch} from "react-icons/fa";
+import {FaArrowLeft, FaTrash, FaRedo, FaSearch} from "react-icons/fa";
 import type {Question} from "../../types/question";
 import {MdCreateNewFolder} from "react-icons/md";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,47 +10,62 @@ import {toast} from "react-toastify";
 import {useExams} from "../../hooks/admin/useExams";
 import type {ExamOption} from "../../types/examOption";
 import {useExamOptions} from "../../hooks/admin/useExamOptions";
-import {getExamOptionsById} from "../../services/examOptions.service";
 
 const ExamQuestionsPage = () => {
+  // Importacion para usar el ID de la url como parametro
   const {examId} = useParams();
+
+  // Importacion de navigate para navegar entre paginas
   const navigate = useNavigate();
 
+  // Exportacion de metodos del hook useQuestions
   const {
     questions,
     loading,
     error,
     fetchQuestions,
-    fetchQuestionById,
     createQuestion,
     updateQuestion,
     deleteQuestion,
     fetchQuestionsByExam,
   } = useQuestions();
 
-  //estado para la visibilidad
+  // Estados para la visibilidad
   const [opcionesVisibles, setOpcionesVisibles] = useState<Set<number>>(
     new Set(),
   );
   const [mostrarFormNuevaOpcion, setMostrarFormNuevaOpcion] = useState<
     Set<number>
   >(new Set());
+
+  // 
   const [nuevaOpcion, setNuevaOpcion] = useState<Record<number, string>>({});
+
+  // Estado para modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Estado para guardar Id en edicion y en busqueda
   const [editResultId, setEditingResultId] = useState<number | null>(null);
   const [searchId, setSearchId] = useState<number | "">("");
 
-  const {exams, fetchExams, fetchExamById} = useExams();
+  // Estado para traer el Examen para el titulo
+  const {fetchExamById} = useExams();
   const [examTitle, setExamTitle] = useState<string>("");
+
+  // Estado para mostrar las opciones por pregunta
   const [opcionesPorPregunta, setOpcionesPorPregunta] = useState<
     Record<number, ExamOption[]>
   >({});
 
+  // Estado para mostrar las opciones editables
   const [opcionesEditables, setOpcionesEditables] = useState<
     Record<number, ExamOption[]>
   >({});
 
+  // Estado para obtener opciones por el id de pregunta
   const {fetchOptionsByQuestions, createExamOption} = useExamOptions();
+
+  // Estado para mostrar las preguntas
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
 
   // crear question DATA
@@ -65,29 +81,31 @@ const ExamQuestionsPage = () => {
     orden: 0,
   });
 
-  // funciones de botones
+  // funciones de botones (EDITAR)
   const handleEditingClick = (question: Question) => {
     setEditingResultId(question.id);
     setFormData({
-      pregunta: question.pregunta,
+      pregunta: question.pregunta, 
       correct_option_id: question.correct_option_id,
     });
     setIsModalOpen(true);
   };
 
+  // Traemos los examenes
   useEffect(() => {
     if (!examId) return;
 
-    // 1️⃣ Fetch examen por id
+    // Fetch examen por id
     fetchExamById(Number(examId)).then((exam) => {
       if (exam) setExamTitle(exam.titulo);
     });
 
-    // 2️⃣ Fetch preguntas del examen
+    // Fetch preguntas del examen
     fetchQuestionsByExam(Number(examId));
   }, [examId]);
 
-  // use effect para buscar por id
+
+  // Use effect para buscar por id
   useEffect(() => {
     setDisplayedQuestions(questions);
   }, [questions]);
@@ -458,101 +476,96 @@ const ExamQuestionsPage = () => {
         ))}
       </div>
 
-      {/* Tabla */}
-      <div className="bg-white shadow rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          {isModalOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-lg p-6 w-96 relative">
-                <h2 className="text-xl font-bold mb-4">
-                  {editResultId !== null ? "Editar Pregunta" : "Crear Pregunta"}
-                </h2>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Pregunta
-                    </label>
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-96 relative">
+            <h2 className="text-xl font-bold mb-4">
+              {editResultId !== null ? "Editar Pregunta" : "Crear Pregunta"}
+            </h2>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Pregunta
+                </label>
 
-                    <input
-                      type="text"
-                      value={formData.pregunta}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          pregunta: String(e.target.value),
-                        })
+                <input
+                  type="text"
+                  value={formData.pregunta}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      pregunta: String(e.target.value),
+                    })
+                  }
+                  className="border px-3 py-2 rounded w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Respuesta correcta
+                </label>
+
+                <input
+                  type="text"
+                  value={formData.correct_option_id}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      correct_option_id: Number(e.target.value),
+                    })
+                  }
+                  className="border px-3 py-2 rounded w-full"
+                />
+              </div>
+
+              <div className="flex justify-end mt-6 gap-3">
+                <button
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                  onClick={() => setIsModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                  onClick={async () => {
+                    try {
+                      if (editResultId !== null) {
+                        // actualizar pregunta existente
+                        await updateQuestion(editResultId, {
+                          exam_id: Number(examId), // obligatoriamente enviamos exam_id
+                          pregunta: formData.pregunta,
+                          correct_option_id: formData.correct_option_id,
+                        });
+                        toast.success("Pregunta actualizada correctamente");
+                      } else {
+                        // crear nueva pregunta
+                        await createQuestion({
+                          exam_id: Number(examId), // <-- aquí usamos el ID del examen
+                          pregunta: formData.pregunta,
+                          correct_option_id: formData.correct_option_id || 0, // si agregas campo respuesta_correcta
+                        });
+                        toast.success("Pregunta creada correctamente");
                       }
-                      className="border px-3 py-2 rounded w-full"
-                    />
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Respuesta correcta
-                    </label>
-
-                    <input
-                      type="text"
-                      value={formData.correct_option_id}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          correct_option_id: Number(e.target.value),
-                        })
-                      }
-                      className="border px-3 py-2 rounded w-full"
-                    />
-                  </div>
-
-                  <div className="flex justify-end mt-6 gap-3">
-                    <button
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Cancelar
-                    </button>
-
-                    <button
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-                      onClick={async () => {
-                        try {
-                          if (editResultId !== null) {
-                            // actualizar pregunta existente
-                            await updateQuestion(editResultId, {
-                              exam_id: Number(examId), // obligatoriamente enviamos exam_id
-                              pregunta: formData.pregunta,
-                              correct_option_id: formData.correct_option_id,
-                            });
-                            toast.success("Pregunta actualizada correctamente");
-                          } else {
-                            // crear nueva pregunta
-                            await createQuestion({
-                              exam_id: Number(examId), // <-- aquí usamos el ID del examen
-                              pregunta: formData.pregunta,
-                              correct_option_id:
-                                formData.correct_option_id || 0, // si agregas campo respuesta_correcta
-                            });
-                            toast.success("Pregunta creada correctamente");
-                          }
-
-                          // cerrar modal y refrescar lista
-                          setIsModalOpen(false);
-                          fetchQuestionsByExam(Number(examId));
-                        } catch (error) {
-                          console.error(error);
-                          toast.error("Error al crear la pregunta");
-                        }
-                      }}
-                    >
-                      Guardar
-                    </button>
-                  </div>
-                </div>
+                      // cerrar modal y refrescar lista
+                      setIsModalOpen(false);
+                      fetchQuestionsByExam(Number(examId));
+                    } catch (error) {
+                      console.error(error);
+                      toast.error("Error al crear la pregunta");
+                    }
+                  }}
+                >
+                  Guardar
+                </button>
               </div>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
