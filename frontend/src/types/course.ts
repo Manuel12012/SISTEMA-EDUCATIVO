@@ -1,12 +1,10 @@
-import type { Module } from "./module";
-
 export interface Course{
     id: number;
     titulo: string;
     descripcion: string;
     grado: Grado;
     imagenUrl: string; // el ? significa si no existe colocale undefined
-    modulos?: Module[];
+    modules_count: string;
 
 }
 

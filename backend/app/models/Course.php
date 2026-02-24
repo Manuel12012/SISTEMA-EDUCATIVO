@@ -67,4 +67,30 @@ class Course extends Model
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $courseId]);
     }
+
+    public static function allWithCourseCount()
+    {
+        $db = Database::connect();
+
+        $sql = "    
+        SELECT
+            c.id,
+            c.titulo,
+            c.descripcion,
+            c.grado,
+            c.imagen_url,
+            COUNT(m.id) AS modules_count
+            FROM courses c
+            LEFT JOIN modules m ON m.course_id = c.id
+            GROUP BY
+            c.id,
+            c.titulo,
+            c.descripcion,
+            c.grado,
+            c.imagen_url
+        ";
+        $stmt = $db->query($sql);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

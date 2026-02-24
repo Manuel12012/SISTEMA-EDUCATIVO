@@ -19,9 +19,13 @@ export default function AppRoutes() {
           path="/admin/exams/:examId/questions"
           element={<ExamQuestionPage />}
         />
-                <Route
+        <Route
           path="/admin/exams/questions/:questionId/exam-options"
           element={<ExamOptionsPage />}
+        />
+        <Route
+          path="/admin/courses/:moduleId/modules"
+          element={<CoursePage />}
         />
       </Route>
     </Routes>

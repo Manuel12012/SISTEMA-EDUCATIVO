@@ -3,8 +3,10 @@ import {useCourses} from "../../hooks/core/useCourses";
 import type {Course, CourseDTOCreate} from "../../types/course";
 import "react-toastify/dist/ReactToastify.css";
 import {toast} from "react-toastify";
+import {useNavigate} from "react-router-dom";
 
 const CoursePage = () => {
+  const navigate = useNavigate();
   const GRADOS = [
     {value: "primaria", label: "Primaria"},
     {value: "secundaria", label: "Secundaria"},
@@ -151,6 +153,7 @@ const CoursePage = () => {
                 <th className="px-6 py-3 text-left">Descripcion</th>
                 <th className="px-6 py-3 text-left">Grado</th>
                 <th className="px-6 py-3 text-left">Imagen</th>
+                <th className="px-6 py-3 text-left">Modulos</th>
                 <th className="px-6 py-3 text-left">Acciones</th>
               </tr>
             </thead>
@@ -171,8 +174,15 @@ const CoursePage = () => {
                     <td className="px-6 py-4">{course.descripcion}</td>
                     <td className="px-6 py-4">{course.grado}</td>
                     <td className="px-6 py-4">{course.imagenUrl}</td>
-
-                    {/* BOTONES DE EDITAR Y ELIMINAR */}
+                    {/* LE PASAMOS EL ID DEL EXAMEN PARA RENDERIZAR QUESTIONS */}
+                    <td
+                      className="px-6 py-4 text-blue-500 cursor-pointer hover:underline"
+                      onClick={() =>
+                        navigate(`/admin/courses/${course.id}/modules`)
+                      }
+                    >
+                      {course.modules_count}
+                    </td>                    {/* BOTONES DE EDITAR Y ELIMINAR */}
                     <td className="px-6 py-4 flex gap-2">
                       <button
                         className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"

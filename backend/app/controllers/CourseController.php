@@ -158,4 +158,14 @@ class CourseController
         Response::json($modules);
     }
 
+
+    public static function allWithModulesCount(){
+        $courses = Course::allWithCourseCount();
+
+        if(empty($courses)){
+            Response::json(["error"=> "No se encontro el curso",404]);
+            return;
+        }
+        Response::json($courses);
+    }
 }

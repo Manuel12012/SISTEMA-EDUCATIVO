@@ -38,7 +38,7 @@ const ExamQuestionsPage = () => {
     Set<number>
   >(new Set());
 
-  // 
+  // Estado para nueva opcion
   const [nuevaOpcion, setNuevaOpcion] = useState<Record<number, string>>({});
 
   // Estado para modal
@@ -49,8 +49,10 @@ const ExamQuestionsPage = () => {
   const [searchId, setSearchId] = useState<number | "">("");
 
   // Estado para traer el Examen para el titulo
-  const {fetchExamById} = useExams();
   const [examTitle, setExamTitle] = useState<string>("");
+
+  // Metodo para traer Examen por ID
+  const {fetchExamById} = useExams();
 
   // Estado para mostrar las opciones por pregunta
   const [opcionesPorPregunta, setOpcionesPorPregunta] = useState<
@@ -62,8 +64,9 @@ const ExamQuestionsPage = () => {
     Record<number, ExamOption[]>
   >({});
 
-  // Estado para obtener opciones por el id de pregunta
-  const {fetchOptionsByQuestions, createExamOption} = useExamOptions();
+  // Metodos de useExamOptions
+  const {fetchOptionsByQuestions, createExamOption, updateExamOption} =
+    useExamOptions();
 
   // Estado para mostrar las preguntas
   const [displayedQuestions, setDisplayedQuestions] = useState<Question[]>([]);
@@ -74,28 +77,12 @@ const ExamQuestionsPage = () => {
     correct_option_id: 0,
   });
 
-  // crear options DATA
-  const [optionData, setOptionData] = useState({
-    question_id: 0,
-    opcion: "",
-    orden: 0,
-  });
-
-  // funciones de botones (EDITAR)
-  const handleEditingClick = (question: Question) => {
-    setEditingResultId(question.id);
-    setFormData({
-      pregunta: question.pregunta, 
-      correct_option_id: question.correct_option_id,
-    });
-    setIsModalOpen(true);
-  };
-
   // Traemos los examenes
   useEffect(() => {
+    // si examenId no existe salimos
     if (!examId) return;
 
-    // Fetch examen por id
+    // Fetch examen por id, y luego seteamos el titulo del examen
     fetchExamById(Number(examId)).then((exam) => {
       if (exam) setExamTitle(exam.titulo);
     });
@@ -104,9 +91,9 @@ const ExamQuestionsPage = () => {
     fetchQuestionsByExam(Number(examId));
   }, [examId]);
 
-
   // Use effect para buscar por id
   useEffect(() => {
+    // Mostramos todas las questions que vienen del hook
     setDisplayedQuestions(questions);
   }, [questions]);
 
@@ -131,6 +118,7 @@ const ExamQuestionsPage = () => {
         {/* IZQUIERDA: botón + título */}
         <div className="flex items-center gap-4">
           <button
+            // si le damos click al boton retrocedemos un link anterior
             onClick={() => navigate(-1)}
             className="bg-gray-300 hover:bg-gray-400 px-2 py-2 rounded"
           >
@@ -151,13 +139,16 @@ const ExamQuestionsPage = () => {
         <button
           className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
           onClick={async () => {
+            // si el Id del Examen no existe salimos
             if (!examId) return;
 
             try {
+              // Almacenamos el id del examen
               const examIdNumber = Number(examId);
 
               // Solo actualizamos las preguntas existentes
               const updates = displayedQuestions.map((q) => {
+                // Retornamos y le pasamos los 2 parametros (1. Id de Question 2. La question)
                 return updateQuestion(q.id, {
                   exam_id: examIdNumber,
                   pregunta: q.pregunta,
@@ -165,8 +156,24 @@ const ExamQuestionsPage = () => {
                 });
               });
 
-              await Promise.all(updates); // Esperamos a que todas terminen
-              toast.success("Todas las preguntas actualizadas correctamente");
+              // Esperamos que se cumpla la promesas
+              await Promise.all(updates);
+
+              // Actualizamos opciones editadas (Explicame mejor esto)
+              const optionUpdates = Object.entries(opcionesEditables).flatMap(
+                ([, opts]) =>
+                  opts.map((opt) =>
+                    updateExamOption(opt.id, {
+                      opcion: opt.opcion,
+                      orden: opt.orden,
+                    }),
+                  ),
+              );
+
+              // Esperamos que se cumpla todas las promesas
+              await Promise.all(optionUpdates);
+
+              toast.success("Preguntas y opciones actualizadas correctamente");
 
               // Refrescamos la lista desde el backend
               fetchQuestionsByExam(examIdNumber);
@@ -183,11 +190,14 @@ const ExamQuestionsPage = () => {
         <button
           className="rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
           onClick={() => {
+            // Setemos el id en null para crear
             setEditingResultId(null);
             setFormData({
               pregunta: "",
               correct_option_id: 0,
             });
+
+            // Abrimos modal
             setIsModalOpen(true);
           }}
         >
@@ -200,6 +210,7 @@ const ExamQuestionsPage = () => {
             placeholder="Buscar por ID"
             value={searchId}
             onChange={(e) =>
+              //Si cambia entonces el valor sera ahora el que se ingresara por input
               setSearchId(e.target.value === "" ? "" : Number(e.target.value))
             }
             className="border px-2 py-2 rounded w-32"
@@ -208,10 +219,15 @@ const ExamQuestionsPage = () => {
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
             onClick={() => {
+              // Si SearchId no es un string vacio entonces:
               if (searchId !== "") {
+                // Buscamos en find, aquellos que coincidan con el id de search
                 const result = questions.find((q) => q.id === searchId);
+
+                // Si existe entonces traemos el resultado en array si no array vacio
                 setDisplayedQuestions(result ? [result] : []);
               } else {
+                //Si es vacio entonces mostramos todas las questions (metodo All de Hook)
                 setDisplayedQuestions(questions);
               }
             }}
@@ -222,6 +238,7 @@ const ExamQuestionsPage = () => {
           <button
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
             onClick={() => {
+              // Seteamos el setSearchId en vacio y llamamos FetchQuestions() para mostrar todas las preguntas
               setSearchId("");
               fetchQuestions();
             }}
@@ -232,6 +249,7 @@ const ExamQuestionsPage = () => {
       </div>
 
       <div className="flex flex-col gap-4">
+        {/* Hacemos un mapeo de displayedQuestions */}
         {displayedQuestions.map((q) => (
           <div key={q.id} className="flex justify-between gap-5 w-full">
             {/* IZQUIERDA */}
@@ -241,6 +259,8 @@ const ExamQuestionsPage = () => {
                 className="border rounded bg-white w-full"
                 value={q.pregunta}
                 onChange={(e) =>
+                  // Si cambia entonces seteamos las questions, hacemos una copia previa y mapeamos por item, si el item.id es igual a q.id
+                  // Entonces guardamos la copia ahora la pregunta sera la nueva ingresa en el input, sino solo seteamos el item
                   setDisplayedQuestions((prev) =>
                     prev.map((item) =>
                       item.id === q.id
@@ -255,9 +275,9 @@ const ExamQuestionsPage = () => {
                 <button
                   className="cursor-pointer bg-green-400 rounded text-white px-4 py-2 text-sm"
                   onClick={async () => {
-                    // si ya esta visible solo ocultamos
-
+                    // Si opciones Visibles tiene el question ID
                     if (opcionesVisibles.has(q.id)) {
+                      // Seteamos opciones visibles hacemos una copia previa, y borramos?
                       setOpcionesVisibles((prev) => {
                         const next = new Set(prev);
                         next.delete(q.id);
@@ -269,21 +289,23 @@ const ExamQuestionsPage = () => {
                     // si no estan cargadas hacemos fetch a options
                     try {
                       if (!opcionesPorPregunta[q.id]) {
+                        // llamoas al metodo y le pasamos id
                         const options = await fetchOptionsByQuestions(q.id);
-                        setOptionData({
-                          question_id: q.id,
-                          opcion: "",
-                          orden: (options?.length ?? 0) + 1,
-                        });
+
+                        // seteamos hacemos copia previa y ahora q.id tendra las opciones cargdas de la pregunta
                         setOpcionesPorPregunta((prev) => ({
                           ...prev,
                           [q.id]: options ?? [],
                         }));
+
+                        // seteamos las opciones editables, hacemos copia previa y q.id tendra las opciones de la pregunta o sera un array vacio
                         setOpcionesEditables((prev) => ({
                           ...prev,
                           [q.id]: options ?? [],
                         }));
                       }
+
+                      // Seteamos las opciones visibles y creamos uno nuevo apartir del id?
                       setOpcionesVisibles((prev) => new Set(prev).add(q.id));
                     } catch (error) {
                       console.error(error);
@@ -297,29 +319,36 @@ const ExamQuestionsPage = () => {
                 </button>
               </div>
 
+              {/* Si opciones visibles tiene id de question entonces mostramos: */}
               {opcionesVisibles.has(q.id) && (
                 <div className="mt-4 bg-white rounded p-4 shadow-sm">
                   <h3 className="font-semibold mb-2 text-gray-700">
                     Opciones:
                   </h3>
 
+                  {/* Si las opciones no tienen valores mostramos: */}
                   {opcionesPorPregunta[q.id]?.length === 0 && (
                     <p className="text-gray-400 text-sm">
                       No hay opciones registradas
                     </p>
                   )}
 
+                  {/* Mapeamos opcion por opcion */}
                   {opcionesPorPregunta[q.id]?.map((opt) => (
                     <div
                       key={opt.id}
-                      className={`flex justify-between items-center border rounded p-2 mb-2 ...`}
+                      className={`flex justify-between items-center border rounded p-2 mb-2`}
                     >
                       <input
                         type="text"
                         value={
+                          // Si opciones editables tiene id buscamos, que opciones y opt id sean iguales, si
+                          // es asi entonces mostramos las opciones si no string vacio
                           opcionesEditables[q.id]?.find((o) => o.id === opt.id)
                             ?.opcion ?? ""
                         }
+                        // Si este cambia entonces seteamos el valor previo, guardamos copia y ahora el q.id sera al previo,
+                        // mapeamos y si el ide de opcion es igual al opt.id entonces pasamos ...o y ahora opcion: sera el ingresado en el input?
                         onChange={(e) =>
                           setOpcionesEditables((prev) => ({
                             ...prev,
@@ -333,6 +362,7 @@ const ExamQuestionsPage = () => {
                         className="border rounded px-2 py-1 text-sm w-1/2"
                       />
 
+                      {/* Lo mismo para orden */}
                       <input
                         type="number"
                         value={
@@ -363,6 +393,7 @@ const ExamQuestionsPage = () => {
                   <div className="flex justify-center bg-blue-500 rounded">
                     <button
                       onClick={() => {
+                        // seteamos nueva opcion, hacemos un prev, y creamos un nuevo prev?
                         setMostrarFormNuevaOpcion((prev) => {
                           const next = new Set(prev);
                           prev.has(q.id) ? next.delete(q.id) : next.add(q.id);
@@ -374,60 +405,67 @@ const ExamQuestionsPage = () => {
                       + Agregar opción
                     </button>
                   </div>
-                </div>
-              )}
 
-              {mostrarFormNuevaOpcion.has(q.id) && (
-                <div className="flex gap-2 items-center border rounded p-2 mt-2 bg-yellow-50">
-                  <input
-                    type="text"
-                    placeholder="Nueva opción..."
-                    value={nuevaOpcion[q.id] ?? ""}
-                    onChange={(e) =>
-                      setNuevaOpcion((prev) => ({
-                        ...prev,
-                        [q.id]: e.target.value,
-                      }))
-                    }
-                    className="border rounded px-2 py-1 text-sm w-1/2"
-                  />
-                  <button
-                    onClick={async () => {
-                      try {
-                        await createExamOption({
-                          question_id: q.id,
-                          opcion: nuevaOpcion[q.id] ?? "",
-                          orden: (opcionesPorPregunta[q.id]?.length ?? 0) + 1,
-                        });
+                  {/* Mostramos nueva opcion si este tiene el id de Question */}
+                  {mostrarFormNuevaOpcion.has(q.id) && (
+                    <div className="flex gap-2 items-center border rounded p-2 mt-2 bg-yellow-50">
+                      <input
+                        type="text"
+                        placeholder="Nueva opción..."
+                        value={nuevaOpcion[q.id] ?? ""}
+                        onChange={(e) =>
+                          // Seteamos la nueva opcion, creamos una copia y asignamos ahora el valor ingresado
+                          setNuevaOpcion((prev) => ({
+                            ...prev,
+                            [q.id]: e.target.value,
+                          }))
+                        }
+                        className="border rounded px-2 py-1 text-sm w-1/2"
+                      />
 
-                        // refrescar opciones
-                        const updated = await fetchOptionsByQuestions(q.id);
-                        setOpcionesPorPregunta((prev) => ({
-                          ...prev,
-                          [q.id]: updated ?? [],
-                        }));
-                        setOpcionesEditables((prev) => ({
-                          ...prev,
-                          [q.id]: updated ?? [],
-                        }));
+                      {/*Boton guardar nueva opcion */}
+                      <button
+                        onClick={async () => {
+                          try {
 
-                        // limpiar y ocultar form
-                        setNuevaOpcion((prev) => ({...prev, [q.id]: ""}));
-                        setMostrarFormNuevaOpcion((prev) => {
-                          const next = new Set(prev);
-                          next.delete(q.id);
-                          return next;
-                        });
+                            // Llamamos al metodo del hook y le seteamos los campos
+                            await createExamOption({
+                              question_id: q.id,
+                              opcion: nuevaOpcion[q.id] ?? "",
+                              orden:
+                                (opcionesPorPregunta[q.id]?.length ?? 0) + 1,
+                            });
 
-                        toast.success("Opción creada exitosamente!");
-                      } catch (error) {
-                        toast.error("No se pudo crear la opción");
-                      }
-                    }}
-                    className="bg-green-500 text-white px-3 py-1 rounded text-sm"
-                  >
-                    Guardar
-                  </button>
+                            // refrescar opciones
+                            const updated = await fetchOptionsByQuestions(q.id);
+                            setOpcionesPorPregunta((prev) => ({
+                              ...prev,
+                              [q.id]: updated ?? [],
+                            }));
+                            setOpcionesEditables((prev) => ({
+                              ...prev,
+                              [q.id]: updated ?? [],
+                            }));
+
+                            // limpiar y ocultar form
+                            setNuevaOpcion((prev) => ({...prev, [q.id]: ""}));
+                            setMostrarFormNuevaOpcion((prev) => {
+                              const next = new Set(prev);
+                              next.delete(q.id);
+                              return next;
+                            });
+
+                            toast.success("Opción creada exitosamente!");
+                          } catch (error) {
+                            toast.error("No se pudo crear la opción");
+                          }
+                        }}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

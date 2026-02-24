@@ -22,7 +22,7 @@ Router::get('badges/{id}', [BadgeController::class, 'show']);
 Router::post('badges', [BadgeController::class, 'store']);
 
 // COURSES
-Router::get('courses', [CourseController::class, 'index']);
+Router::get('courses', [CourseController::class, 'allWithModulesCount']);
 Router::get('courses/{id}', [CourseController::class, 'show']);
 Router::post('courses', [CourseController::class, 'store']);
 Router::put('courses/{id}', [CourseController::class, 'update']);
