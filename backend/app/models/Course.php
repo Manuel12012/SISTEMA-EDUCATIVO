@@ -27,18 +27,18 @@ class Course extends Model
     }
 
     public static function create($data)
-    { // $data contiene los datos de la pregunta a insertar
+    {
         $db = Database::connect();
         $stmt = $db->prepare(
-            "INSERT INTO courses (titulo, descripcion, grado)
-                    VALUES (:titulo, :descripcion, :grado)"
+            "INSERT INTO courses (titulo, descripcion, grado, imagen_url)
+                VALUES (:titulo, :descripcion, :grado, :imagen_url)"
         );
         $stmt->execute([
             "titulo" => $data["titulo"],
             "descripcion" => $data["descripcion"],
             "grado" => $data["grado"],
+            "imagen_url" => $data["imagen_url"] ?? "",
         ]);
-        // retornamos con lastInsertId porque sera de manera auto_increment
         return (int) $db->lastInsertId();
     }
 
@@ -47,13 +47,14 @@ class Course extends Model
         $db = Database::connect();
         $stmt = $db->prepare(
             "UPDATE courses SET titulo = :titulo, descripcion = :descripcion,
-                grado = :grado
+                grado = :grado, imagen_url = :imagen_url
             WHERE id = :id"
         ); // retornamos igual un stmt y lo almacenamos en un array $data y tambien el $questionId
         return $stmt->execute([
             "titulo" => $data["titulo"],
             "descripcion" => $data["descripcion"],
             "grado" => $data["grado"],
+            "imagen_url" => $data["imagen_url"] ?? "",
             "id" => $courseId
         ]);
     }

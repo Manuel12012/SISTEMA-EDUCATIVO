@@ -4,9 +4,10 @@ import {
     getCourseById, getCourses, createCourse as createCourseService
     , updateCourse as updateCourseService
     , deleteCourse as deleteCourseService
+    , uploadCourseImage
 } from "../../services/courses.service";
 import type { Module } from "../../types/module";
-import type { Lesson } from "../../types/lesson";
+import type { Lesson, LessonDTOCreate } from "../../types/lesson";
 import {
     getModuleById, getModules, createModule as createModuleService,
     updateModule as updateModuleService, deleteModule as deleteModuleService,
@@ -55,7 +56,18 @@ export const useCourses = () => {
             setLoading(false);
         }
     }
-
+    const uploadImageHandler = async (file: File) => {
+        try {
+            setLoading(true);
+            const { imageUrl } = await uploadCourseImage(file);
+            return imageUrl;
+        } catch (err: any) {
+            setError(err.message || "Error al subir imagen");
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
     const fetchCourseById = async (id: number) => {
         try {
             setLoading(true);
@@ -257,13 +269,13 @@ export const useCourses = () => {
         }
     }
 
-    const createLesson = async (lessonData: Omit<Lesson, "id">) => {
+    const createLesson = async (lessonData: LessonDTOCreate) => {
         try {
             setLoading(true);
             setError(null);
 
             const response = await createLessonService(lessonData);
-           await fetchLessons();
+            await fetchLessons();
             return response;
         } catch (error) {
             setError("Error al crear la leccion");
@@ -305,21 +317,21 @@ export const useCourses = () => {
         }
     }
 
-    const fetchLessonsByModule = async (moduleId: number) => {
-        try {
-            setLoading(true);
-            setError(null);
+const fetchLessonsByModule = async (moduleId: number) => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const data = await getLessonsByModule(moduleId);
-            setLessons(data);
-        } catch (error) {
-            setError("Error al obtener la leccion");
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-
+        const data = await getLessonsByModule(moduleId);
+        setLessons(data);
+        return data; // 👈 agrega esto
+    } catch (error) {
+        setError("Error al obtener la leccion");
+        throw error;
+    } finally {
+        setLoading(false);
     }
+}
 
     return {
         courses,
@@ -336,6 +348,7 @@ export const useCourses = () => {
         createCourse,
         updateCourse,
         deleteCourse,
+        uploadImageHandler,
         // modules
         fetchModules,
         fetchModuleById,

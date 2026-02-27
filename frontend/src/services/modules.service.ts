@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { Module } from "../types/module"
+import type { Module, ModuleDTOCreate } from "../types/module"
 
 export const getModules = async (): Promise<Module[]> => {
     const { data } = await api.get<Module[]>("/modules");
@@ -11,7 +11,7 @@ export const getModuleById = async (id: number): Promise<Module> => {
     return data;
 }
 
-export const createModule = async (module: Omit<Module, "id">):
+export const createModule = async (module: ModuleDTOCreate):
     Promise<{ message: string, id: number }> => {
     const { data } = await api.post("/modules", module);
     return data;

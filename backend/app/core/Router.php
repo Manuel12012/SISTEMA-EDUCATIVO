@@ -59,9 +59,16 @@ class Router
 
                 // resuelve el controller + metodo
                 [$controller, $methodName] = $route['action'];
-                // leer body JSON
-                $body = json_decode(file_get_contents("php://input"), true);
-                $body = $body ?? [];
+// leer body según Content-Type
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+if (str_contains($contentType, 'multipart/form-data')) {
+    // para uploads, los datos vienen en $_POST y $_FILES
+    $body = $_POST;
+} else {
+    // para JSON normal
+    $body = json_decode(file_get_contents("php://input"), true) ?? [];
+}
 
                 // llamar al controller
                 call_user_func_array(

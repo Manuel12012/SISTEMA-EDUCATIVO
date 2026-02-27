@@ -28,6 +28,7 @@ Router::post('courses', [CourseController::class, 'store']);
 Router::put('courses/{id}', [CourseController::class, 'update']);
 Router::delete('courses/{id}', [CourseController::class, 'destroy']);
 Router::get('courses/{id}/modules', [CourseController::class, 'modules']);
+Router::post('/course/upload', [CourseController::class, 'uploadImage']);
 
 // EXAMS
 Router::get('exams', [ExamController::class, 'allWithQuestionCount']);

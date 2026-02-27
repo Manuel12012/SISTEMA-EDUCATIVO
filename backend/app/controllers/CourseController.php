@@ -16,7 +16,7 @@ class CourseController
             Response::json(["error" => "No se encontraron cursos"], 404);
             return;
         }
-        
+
         // devolvemos un json pasandole la variable courses
         Response::json($courses);
     }
@@ -47,24 +47,25 @@ class CourseController
         Response::json($course);
     }
 
-    public static function store($data){
+    public static function store($data)
+    {
         if (
             empty($data["titulo"]) ||
             empty($data["descripcion"]) ||
             empty($data["grado"])
-                    ) {
+        ) {
             Response::json([
                 "error" => "Datos incompletos"
-            ],400);
+            ], 400);
             exit;
         }
 
         $course = Course::create($data);
 
-        if(!$course){
+        if (!$course) {
             Response::json([
                 "error" => "No se pudo crear el curso"
-            ],500);
+            ], 500);
             exit;
         }
 
@@ -74,17 +75,18 @@ class CourseController
         ], 201);
     }
 
-    public static function update($courseId, $data){
-        if(!is_numeric($courseId)){
-                Response::json([
-                    "error" => "ID invalido"
-                ], 400);
-                return;
+    public static function update($courseId, $data)
+    {
+        if (!is_numeric($courseId)) {
+            Response::json([
+                "error" => "ID invalido"
+            ], 400);
+            return;
         }
 
         $course = Course::find($courseId);
 
-        if(!$course){
+        if (!$course) {
             Response::json([
                 "error" => "No se encontro el curso"
             ]);
@@ -93,10 +95,10 @@ class CourseController
 
         $updated = Course::update($courseId, $data);
 
-        if(!$updated){
+        if (!$updated) {
             Response::json([
                 "error" => "No se pudo actualizar"
-            ],500);
+            ], 500);
             exit;
         }
 
@@ -105,7 +107,8 @@ class CourseController
         ]);
     }
 
-    public static function destroy($courseId){
+    public static function destroy($courseId)
+    {
         if (!is_numeric($courseId)) {
             Response::json(
                 [
@@ -118,17 +121,17 @@ class CourseController
 
         $course = Course::find($courseId);
 
-        if(!$course){
+        if (!$course) {
             Response::json([
                 "error" => "No se pudo encontrar el curso"
-            ],404);
+            ], 404);
             exit;
         }
 
         Course::delete($courseId);
 
         Response::json([
-            "message"=> "Curso eliminado"
+            "message" => "Curso eliminado"
         ]);
     }
 
@@ -159,13 +162,58 @@ class CourseController
     }
 
 
-    public static function allWithModulesCount(){
+    public static function allWithModulesCount()
+    {
         $courses = Course::allWithCourseCount();
 
-        if(empty($courses)){
-            Response::json(["error"=> "No se encontro el curso",404]);
+        if (empty($courses)) {
+            Response::json(["error" => "No se encontro el curso", 404]);
             return;
         }
         Response::json($courses);
     }
+
+    public static function uploadImage()
+{
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+        $file = $_FILES['image'];
+
+        // Crear carpeta si no existe
+        $uploadDir = __DIR__ . '/../../public/uploads/courses/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // Crear nombre único siempre en .jpg
+        $filename = time() . '_' . pathinfo($file['name'], PATHINFO_FILENAME) . '.jpg';
+        $destination = $uploadDir . $filename;
+
+        // Detectar tipo y convertir a JPG con GD
+$mime = $file['type'];
+        $image = match($mime) {
+            'image/jpeg' => imagecreatefromjpeg($file['tmp_name']),
+            'image/png'  => imagecreatefrompng($file['tmp_name']),
+            'image/gif'  => imagecreatefromgif($file['tmp_name']),
+            'image/webp' => imagecreatefromwebp($file['tmp_name']),
+            default      => null
+        };
+
+        if (!$image) {
+            Response::json(['error' => 'Formato no soportado']);
+            return;
+        }
+
+        // Guardar siempre como JPG
+        if (imagejpeg($image, $destination, 90)) {
+            imagedestroy($image); // liberar memoria
+            $url = '/uploads/courses/' . $filename;
+            Response::json(['imageUrl' => $url]);
+        } else {
+            Response::json(['error' => 'Error al guardar la imagen']);
+        }
+
+    } else {
+        Response::json(['error' => 'No se envió archivo']);
+    }
+}
 }

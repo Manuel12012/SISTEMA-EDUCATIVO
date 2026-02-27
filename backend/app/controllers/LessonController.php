@@ -74,10 +74,10 @@ class LessonController
             ]);
             return;
         }
-        Response::json([
-            "lesson" => $lesson,
-            "module" => $module
-        ]);
+        Response::json(
+     $lesson
+           
+        );
     }
 
     public static function store($data)

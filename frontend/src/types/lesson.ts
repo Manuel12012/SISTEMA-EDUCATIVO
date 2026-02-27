@@ -5,4 +5,13 @@ export interface Lesson{
     titulo: string;
     tipo: LessonType;
     contenido: string; // URL o texto
+    orden: number
+}
+
+export interface LessonDTOCreate{
+    module_id: number,
+    titulo: string,
+    tipo: LessonType,
+    contenido: string,
+    orden: number
 }

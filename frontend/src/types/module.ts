@@ -1,6 +1,12 @@
 export interface Module{
     id: number;
+    course_id: number,
     titulo: string;
     orden: number;
-    completado?: boolean;
+}
+
+export interface ModuleDTOCreate{
+    course_id: number,
+    titulo: string,
+    orden: number,
 }

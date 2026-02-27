@@ -3,7 +3,7 @@ export interface Course{
     titulo: string;
     descripcion: string;
     grado: Grado;
-    imagenUrl: string; // el ? significa si no existe colocale undefined
+    imagen_url: string; // el ? significa si no existe colocale undefined
     modules_count: string;
 
 }

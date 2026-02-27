@@ -5,7 +5,8 @@ import MainLayout from "../layouts/MainLayout";
 import CoursePage from "../pages/admin/CoursePage";
 import UsersPage from "../pages/admin/UsersPage";
 import ExamQuestionPage from "../pages/admin/ExamQuestionPage";
-import ExamOptionsPage from "../pages/admin/ExamOptionsPage";
+import ModulePage from "../pages/ModulePage";
+import LessonPage from "../pages/admin/LessonPage";
 
 export default function AppRoutes() {
   return (
@@ -20,12 +21,12 @@ export default function AppRoutes() {
           element={<ExamQuestionPage />}
         />
         <Route
-          path="/admin/exams/questions/:questionId/exam-options"
-          element={<ExamOptionsPage />}
+          path="/admin/courses/:courseId/modules"
+          element={<ModulePage />}
         />
         <Route
-          path="/admin/courses/:moduleId/modules"
-          element={<CoursePage />}
+          path="/admin/courses/:courseId/modules/:moduleId/lessons/:lessonId"
+          element={<LessonPage />}
         />
       </Route>
     </Routes>
