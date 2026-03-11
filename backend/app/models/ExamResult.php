@@ -1,7 +1,9 @@
 <?php
 
 require_once __DIR__ . '/../core/Model.php';
-
+require_once __DIR__ . '/ExamAnswer.php';
+require_once __DIR__ . '/Exam.php';
+require_once __DIR__ . '/Question.php';
 class ExamResult extends Model
 {
     protected static string $table = 'exam_results';
@@ -100,13 +102,13 @@ class ExamResult extends Model
         return $stmt->execute(["id" => $examResultsId]);
     }
 
- // creamos una funcion para crear un examen desde los submissions
+    // creamos una funcion para crear un examen desde los submissions
     public static function createFromSubmission(int $examId, int $userId, array $answers)
     { // conectamos la base de datos e iniciamos beginTransaction 
         $db = Database::connect();
         $db->beginTransaction();
 
-        
+
         try {
             // buscamos el examen por el id, y guardamos en $exam
             $exam = Exam::find($examId);
@@ -115,7 +117,24 @@ class ExamResult extends Model
             if (!$exam) {
                 throw new Exception("Examen no encontrado");
             }
+            // Verificar si el usuario ya rindió este examen
+            $stmt = $db->prepare("
+    SELECT id FROM exam_results
+    WHERE user_id = :user_id
+    AND exam_id = :exam_id
+    LIMIT 1
+");
 
+            $stmt->execute([
+                "user_id" => $userId,
+                "exam_id" => $examId
+            ]);
+
+            $alreadyTaken = $stmt->fetch();
+
+            if ($alreadyTaken) {
+                throw new Exception("Ya has rendido este examen");
+            }
             // obtenemos las preguntas por el examen, y guardamos en $questions
             $questions = Question::getByExam($examId);
 
@@ -123,9 +142,11 @@ class ExamResult extends Model
             if (empty($questions)) {
                 throw new Exception("El examen no tiene preguntas");
             }
-
-            // iniciamos total y le pasamos las preguntas
             $total = count($questions);
+
+            if ($total === 0) {
+                throw new Exception("No hay preguntas válidas con respuesta correcta definida.");
+            }
 
             // inicializamos correctas en 0
             $correctas = 0;
@@ -146,42 +167,46 @@ class ExamResult extends Model
 
             // devolvemos un id y almacenamos en resultId
             $resultId = (int) $db->lastInsertId();
-
-            // por cada pregunta recorremos
             foreach ($questions as $question) {
 
-            // questionId sera igual al campo id de questions
                 $questionId = $question["id"];
+                $selectedOptionId = $answers[$questionId] ?? null;
 
-                // le pasamos el id al arreglo de answers y decimos si no ha sido seteada , continuamos
-                if (!isset($answers[$questionId])) {
-                    continue;
+                if (!$selectedOptionId) {
+                    continue; // no respondió
                 }
 
-                // le pasamos questiondId al array answers y guardamos en selectedOptionId
-                $selectedOptionId = $answers[$questionId];
+                // Buscar opción válida y verificar si es correcta
+                $stmtOption = $db->prepare("
+        SELECT es_correcta 
+        FROM exam_options 
+        WHERE id = :id AND question_id = :question_id
+    ");
 
-                // Obtener opción seleccionada por ID
-                $option = ExamOption::find($selectedOptionId);
+                $stmtOption->execute([
+                    "id" => $selectedOptionId,
+                    "question_id" => $questionId
+                ]);
 
-                // iniciamos isCorrect en 0
-                $isCorrect = 0;
+                $option = $stmtOption->fetch();
 
-                // si option y option en el campo opcion es igual a la respuesta correcta de la pregunta entonces
-                if ($option && $option["opcion"] === $question["respuesta_correcta"]) {
-                    // sumamos en 1 correctas
+                if (!$option) {
+                    continue; // opción manipulada o inválida
+                }
+
+                $isCorrect = (int) $option["es_correcta"];
+
+                if ($isCorrect === 1) {
                     $correctas++;
-                    // decimos que iscorrect ahora sera 1 es decir correcto
-                    $isCorrect = 1;
                 }
 
-                // creamos el examen y le pasamos: resultId, questionId, selectedOptionId, e isCorrect que sera acumulativo? y $correctas?
+                // Guardar respuesta
                 ExamAnswer::create([
                     "exam_result_id" => $resultId,
                     "question_id" => $questionId,
                     "selected_option_id" => $selectedOptionId,
                     "es_correcta" => $isCorrect
-                ]);
+                ], $db);
             }
 
             // el puntaje y puntos ganados dependen de esta formula el MAXIMO PUNTAJE SERA 100
@@ -225,7 +250,6 @@ class ExamResult extends Model
                 "puntos" => $puntosGanados,
                 "motivo" => "Examen ID $examId completado"
             ]);
-
             $db->commit();
 
             // finalmente retornamos el id del resultado, el puntaje(redondeamos), correctas, total de preguntas, y puntos ganados
@@ -237,9 +261,9 @@ class ExamResult extends Model
                 "puntos_ganados" => $puntosGanados
             ];
         } catch (Exception $e) {
-
-            $db->rollBack();
-            throw $e;
+    echo "ERROR: " . $e->getMessage();
+    $db->rollBack();
+    exit;
         }
     }
 }

@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/Badge.php';
 require_once __DIR__ . '/../core/Response.php';
-
 class BadgeController
 {
     public static function index()

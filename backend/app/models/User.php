@@ -64,6 +64,9 @@ class User extends Model
     public static function create($data)
     { // $data contiene los datos de la pregunta a insertar
         $db = Database::connect();
+
+        // Antes de hacer el insert hasheamos el password
+        $passwordHasheado =password_hash($data["password"], PASSWORD_DEFAULT) ;
         $stmt = $db->prepare(
             "INSERT INTO users (nombre, email, password, rol, 
              avatar_url )
@@ -73,7 +76,7 @@ class User extends Model
         $stmt->execute([
             "nombre" => $data["nombre"],
             "email" => $data["email"],
-            "password" => $data["password"],
+            "password" => $passwordHasheado,
             "rol" => $data["rol"],
             "avatar_url" => $data["avatar_url"]
         ]);

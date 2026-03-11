@@ -62,9 +62,15 @@ export const getResultsByExam = async (id: number): Promise<ExamResultResponse> 
     return data;
 }
 
-// creamos function de submit y le pasamos el id del examen y lo demas como record y payload porque envuelve answers aun no entiendo
-export const submitExam = async (id: number, payload: { answers: Record<number, number> }
-): Promise<SubmitExamResponse> => {
-    const { data } = await api.post(`/exams/${id}/submit`, payload);
-    return data;
+export const takeExam = async (id: number) => {
+  const { data } = await api.get(`/exams/${id}/take`);
+  return data;
+};
+
+export const submitExam = async (
+  id: number,
+  answers: { [key: number]: number }
+) => {
+  const { data } = await api.post(`/exams/${id}/submit`, { answers });
+  return data;
 };

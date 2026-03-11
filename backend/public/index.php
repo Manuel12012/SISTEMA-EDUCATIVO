@@ -1,6 +1,7 @@
 <?php
 define('BASE_PATH', dirname(__DIR__));
-
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../config.php';
 // Cabeceras CORS
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: http://localhost:5173");

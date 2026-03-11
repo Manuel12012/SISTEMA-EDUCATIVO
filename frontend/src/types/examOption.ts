@@ -3,6 +3,7 @@ export interface ExamOption{
     question_id: number;
     opcion: string;
     orden: number | null;
+    es_correcta: number
 }
 
 export interface ExamOptionDTOCreate{

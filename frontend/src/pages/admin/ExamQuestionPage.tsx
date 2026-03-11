@@ -74,7 +74,6 @@ const ExamQuestionsPage = () => {
   // crear question DATA
   const [formData, setFormData] = useState({
     pregunta: "",
-    correct_option_id: 0,
   });
 
   // Traemos los examenes
@@ -152,7 +151,6 @@ const ExamQuestionsPage = () => {
                 return updateQuestion(q.id, {
                   exam_id: examIdNumber,
                   pregunta: q.pregunta,
-                  correct_option_id: q.correct_option_id,
                 });
               });
 
@@ -164,8 +162,9 @@ const ExamQuestionsPage = () => {
                 ([, opts]) =>
                   opts.map((opt) =>
                     updateExamOption(opt.id, {
+                      question_id: opt.question_id,
                       opcion: opt.opcion,
-                      orden: opt.orden,
+                      es_correcta: opt.es_correcta,     
                     }),
                   ),
               );
@@ -194,7 +193,6 @@ const ExamQuestionsPage = () => {
             setEditingResultId(null);
             setFormData({
               pregunta: "",
-              correct_option_id: 0,
             });
 
             // Abrimos modal
@@ -334,21 +332,31 @@ const ExamQuestionsPage = () => {
                   )}
 
                   {/* Mapeamos opcion por opcion */}
-                  {opcionesPorPregunta[q.id]?.map((opt) => (
+                  {opcionesEditables[q.id]?.map((opt) => (
                     <div
                       key={opt.id}
-                      className={`flex justify-between items-center border rounded p-2 mb-2`}
+                      className="flex items-center gap-3 border rounded p-2 mb-2"
                     >
+                      {/* Radio para marcar correcta */}
+                      <input
+                        type="radio"
+                        name={`correct-${q.id}`}
+                        checked={opt.es_correcta === 1}
+                        onChange={() =>
+                          setOpcionesEditables((prev) => ({
+                            ...prev,
+                            [q.id]: prev[q.id].map((o) => ({
+                              ...o,
+                              es_correcta: o.id === opt.id ? 1 : 0, // 🔥 1 o 0, no true/false
+                            })),
+                          }))
+                        }
+                      />
+
+                      {/* Input texto */}
                       <input
                         type="text"
-                        value={
-                          // Si opciones editables tiene id buscamos, que opciones y opt id sean iguales, si
-                          // es asi entonces mostramos las opciones si no string vacio
-                          opcionesEditables[q.id]?.find((o) => o.id === opt.id)
-                            ?.opcion ?? ""
-                        }
-                        // Si este cambia entonces seteamos el valor previo, guardamos copia y ahora el q.id sera al previo,
-                        // mapeamos y si el ide de opcion es igual al opt.id entonces pasamos ...o y ahora opcion: sera el ingresado en el input?
+                        value={opt.opcion}
                         onChange={(e) =>
                           setOpcionesEditables((prev) => ({
                             ...prev,
@@ -362,27 +370,7 @@ const ExamQuestionsPage = () => {
                         className="border rounded px-2 py-1 text-sm w-1/2"
                       />
 
-                      {/* Lo mismo para orden */}
-                      <input
-                        type="number"
-                        value={
-                          opcionesEditables[q.id]?.find((o) => o.id === opt.id)
-                            ?.orden ?? 0
-                        }
-                        onChange={(e) =>
-                          setOpcionesEditables((prev) => ({
-                            ...prev,
-                            [q.id]: prev[q.id].map((o) =>
-                              o.id === opt.id
-                                ? {...o, orden: Number(e.target.value)}
-                                : o,
-                            ),
-                          }))
-                        }
-                        className="border rounded px-2 py-1 text-sm w-16"
-                      />
-
-                      {q.correct_option_id === opt.id && (
+                      {opt.es_correcta && (
                         <span className="text-green-600 font-semibold text-sm">
                           Correcta
                         </span>
@@ -427,7 +415,6 @@ const ExamQuestionsPage = () => {
                       <button
                         onClick={async () => {
                           try {
-
                             // Llamamos al metodo del hook y le seteamos los campos
                             await createExamOption({
                               question_id: q.id,
@@ -540,24 +527,6 @@ const ExamQuestionsPage = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Respuesta correcta
-                </label>
-
-                <input
-                  type="text"
-                  value={formData.correct_option_id}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      correct_option_id: Number(e.target.value),
-                    })
-                  }
-                  className="border px-3 py-2 rounded w-full"
-                />
-              </div>
-
               <div className="flex justify-end mt-6 gap-3">
                 <button
                   className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
@@ -575,7 +544,6 @@ const ExamQuestionsPage = () => {
                         await updateQuestion(editResultId, {
                           exam_id: Number(examId), // obligatoriamente enviamos exam_id
                           pregunta: formData.pregunta,
-                          correct_option_id: formData.correct_option_id,
                         });
                         toast.success("Pregunta actualizada correctamente");
                       } else {
@@ -583,7 +551,6 @@ const ExamQuestionsPage = () => {
                         await createQuestion({
                           exam_id: Number(examId), // <-- aquí usamos el ID del examen
                           pregunta: formData.pregunta,
-                          correct_option_id: formData.correct_option_id || 0, // si agregas campo respuesta_correcta
                         });
                         toast.success("Pregunta creada correctamente");
                       }

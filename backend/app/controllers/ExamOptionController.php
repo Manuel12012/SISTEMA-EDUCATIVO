@@ -42,8 +42,9 @@ class ExamOptionController
     public static function store($data)
     {
         if (
-            empty($data["question_id"]) ||
-            empty($data["opcion"])
+            !isset($data["question_id"]) ||
+            empty($data["opcion"]) ||
+            !isset($data["es_correcta"])
         ) {
             Response::json([
                 "error" => "Datos incompletos"

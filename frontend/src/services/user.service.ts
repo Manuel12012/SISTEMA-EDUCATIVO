@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { User, UserDTOCreate } from "../types/user"
+import type { LoginResponse, MeResponse, User, UserDTOCreate, UserLogin } from "../types/user"
 import type { ExamResult } from "../types/examResult";
 
 export const getUsers = async (): Promise<User[]> => {
@@ -33,4 +33,18 @@ export const getResultsByUser = async (userId: number): Promise<ExamResult[]> =>
     const { data } = await api.get<ExamResult[]>(`/users/${userId}/results`);
     return data;
 }
+
+export const getMe = async (): Promise<MeResponse> => {
+    const { data } = await api.get<MeResponse>("/me");
+    return data;
+}
+
+export const loginUser = async (
+    credentials: UserLogin
+): Promise<LoginResponse> => {
+
+    const { data } = await api.post<LoginResponse>("/login", credentials);
+
+    return data;
+};
 

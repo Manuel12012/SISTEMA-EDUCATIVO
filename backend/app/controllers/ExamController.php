@@ -206,7 +206,49 @@ class ExamController
         ]);
     }
 
-    public static function submit($examId, $data)
+public static function submit($examId, $data = null)
+{
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    if (!$data) {
+        Response::json([
+            "error" => "No se recibieron datos"
+        ], 400);
+        return;
+    }
+
+    if (!is_numeric($examId)) {
+        Response::json(["error" => "ID invalido"], 400);
+        return;
+    }
+
+    if (empty($data["answers"]) || !is_array($data["answers"])) {
+        Response::json(["error" => "Respuestas invalidas"], 400);
+        return;
+    }
+
+    $exam = Exam::find($examId);
+
+    if (!$exam) {
+        Response::json(["error" => "Examen no encontrado"], 404);
+        return;
+    }
+
+    $userId = 1; // temporal
+
+    $result = ExamResult::createFromSubmission(
+        $examId,
+        $userId,
+        $data["answers"]
+    );
+
+    Response::json([
+        "message" => "Examen enviado correctamente",
+        "result" => $result
+    ], 201);
+}
+
+    public static function take($examId)
     {
         if (!is_numeric($examId)) {
             Response::json([
@@ -215,25 +257,8 @@ class ExamController
             return;
         }
 
-        if (!isset($_SESSION['user'])) {
-            Response::json([
-                "error" => "No autenticado"
-            ], 401);
-            return;
-        }
+        $exam = Exam::findActive($examId);
 
-        // si el $data viene vacio $answers del modelo o no es un array entonces retornamos respuestas invalidas
-        if (empty($data["answers"]) || !is_array($data["answers"])) {
-            Response::json([
-                "error" => "Respuestas invalidas"
-            ], 400);
-            return;
-        }
-
-        // buscamos el examen por id
-        $exam = Exam::find($examId);
-
-        // si examen no existe
         if (!$exam) {
             Response::json([
                 "error" => "Examen no encontrado"
@@ -241,16 +266,38 @@ class ExamController
             return;
         }
 
-        // user id sera igual al usuario que inicio sesion
-        $userId = (int) $_SESSION['user']['id'];
+        // Obtener preguntas
+        $questions = Question::getByExam($examId);
 
-        // llamamos al metodo CreateFromSubmission y le pasamos los 3 argumentos
-        $result = ExamResult::createFromSubmission($examId, $userId, $data["answers"]);
+        $filteredQuestions = [];
 
-        // respondemos con un json 
+        $filteredQuestions = [];
+
+        foreach ($questions as $q) {
+
+            $options = ExamOption::getByQuestion($q['id']);
+
+            if (empty($options)) {
+                continue;
+            }
+
+            // 🔥 Eliminar datos sensibles de la pregunta
+            unset($q['correct_option_id']);
+            unset($q['exam_id']);
+
+            // 🔥 Eliminar is_correct de cada opción
+            foreach ($options as &$option) {
+                unset($option['is_correct']);
+            }
+
+            $q['options'] = $options;
+
+            $filteredQuestions[] = $q;
+        }
+
         Response::json([
-            "message" => "Examen enviado correctamente",
-            "result" => $result
-        ], 201);
+            "exam" => $exam,
+            "questions" => $filteredQuestions
+        ]);
     }
 }

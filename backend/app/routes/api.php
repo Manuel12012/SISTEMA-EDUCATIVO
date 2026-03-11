@@ -1,6 +1,10 @@
 <?php
 
 // REQUIRES A CONTROLLER
+
+use App\Middleware\AuthMiddleware;
+use App\Middleware\RoleMiddleware;
+
 require_once __DIR__ . '/../controllers/BadgeController.php';
 require_once __DIR__ . '/../controllers/CourseController.php';
 require_once __DIR__ . '/../controllers/ExamController.php';
@@ -15,7 +19,6 @@ require_once __DIR__ . '/../controllers/UserController.php';
 require_once __DIR__ . '/../controllers/EnrollmentController.php';
 
 
-
 // BADGES
 Router::get('badges', [BadgeController::class, 'index']);
 Router::get('badges/{id}', [BadgeController::class, 'show']);
@@ -24,7 +27,12 @@ Router::post('badges', [BadgeController::class, 'store']);
 // COURSES
 Router::get('courses', [CourseController::class, 'allWithModulesCount']);
 Router::get('courses/{id}', [CourseController::class, 'show']);
-Router::post('courses', [CourseController::class, 'store']);
+Router::post('courses', [CourseController::class, 'store'],[function(){$user = AuthMiddleware::verify(); RoleMiddleware::handle($user,["admin"]);}]);
+
+Router::middleware(["auth", "admin"])->group(function(){
+    Router::post("courses", [CourseController::class, "store"]);
+});
+
 Router::put('courses/{id}', [CourseController::class, 'update']);
 Router::delete('courses/{id}', [CourseController::class, 'destroy']);
 Router::get('courses/{id}/modules', [CourseController::class, 'modules']);
@@ -38,6 +46,7 @@ Router::put('exams/{id}', [ExamController::class, 'update']);
 Router::delete('exams/{id}', [ExamController::class, 'destroy']);
 Router::get('exams/{id}/results', [ExamController::class, 'results']);
 Router::get('exams/{id}/questions', [ExamController::class, 'getQuestionsByExam']);
+Router::get('exams/{id}/take', [ExamController::class, 'take']);
 
 
 // EXAM OPTIONS
@@ -80,7 +89,7 @@ Router::get('point-histories', [PointHistoryController::class, 'index']);
 Router::get('point-histories/{id}', [PointHistoryController::class, 'show']);
 Router::put('point-histories/{id}', [PointHistoryController::class, 'update']);
 Router::delete('point-histories/{id}', [PointHistoryController::class, 'destroy']);
-Router::get('users/{userId}/point-histories',[PointHistoryController::class, 'byUser']);
+Router::get('users/{userId}/point-histories', [PointHistoryController::class, 'byUser']);
 
 // QUESTIONS
 Router::get('questions', [QuestionController::class, 'allWithOptionsCount']);
@@ -102,6 +111,10 @@ Router::post('users', [UserController::class, 'store']);
 Router::put('users/{id}', [UserController::class, 'update']);
 Router::delete('users/{id}', [UserController::class, 'destroy']);
 Router::get('users/{userId}/results', [UserController::class, 'resultsByUser']);
+Router::post('login', [UserController::class, 'login']);
+Router::get('me', [UserController::class, 'me'],[function(){ AuthMiddleware::verify();}]);
+
+
 
 // SUBMIT EXAMS
 Router::post('exams/{id}/submit', [ExamController::class, 'submit']);
@@ -109,7 +122,3 @@ Router::post('exams/{id}/submit', [ExamController::class, 'submit']);
 //COURSE ENROLLMENTS
 Router::post('enrollment/user/{userId}/course/{courseId}', [EnrollmentController::class, 'enroll']);
 Router::get('enrollment/user/{userId}', [EnrollmentController::class, 'myCourses']);
-
-
-
-
