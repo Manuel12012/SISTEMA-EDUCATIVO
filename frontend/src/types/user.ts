@@ -4,7 +4,7 @@ export interface User {
   id: number;
   nombre: string;
   email: string;
-  password?: string;
+  password: string;
   rol: Rol;
   avatar_url: string;
 }
@@ -45,3 +45,13 @@ export interface AuthUser {
   email: string;
   rol: Rol;
 }
+
+export type UsersResponse = {
+  data: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+};

@@ -40,22 +40,25 @@ export const useCourses = () => {
 
     // COURSES METHODS
 
-    const fetchCourses = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+const fetchCourses = async (): Promise<Course[]> => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const data = await getCourses();
+        const data = await getCourses();
 
-            setCourses(data);
-        } catch (error) {
-            setError("Error al obtener los cursos")
-            throw error;
+        setCourses(data);
 
-        } finally {
-            setLoading(false);
-        }
+        return data; // 👈 FALTABA ESTO
+
+    } catch (error) {
+        setError("Error al obtener los cursos")
+        throw error;
+
+    } finally {
+        setLoading(false);
     }
+}
     const uploadImageHandler = async (file: File) => {
         try {
             setLoading(true);
@@ -140,21 +143,24 @@ export const useCourses = () => {
     }
 
     // MODULES METHODS
-    const fetchModules = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+const fetchModules = async (): Promise<Module[]> => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const data = await getModules();
-            setModules(data);
+        const data = await getModules();
+        setModules(data);
 
-        } catch (error) {
-            setError("Error al obtener los modulos");
-            throw error;
-        } finally {
-            setLoading(false);
-        }
+        return data;
+
+    } catch (error) {
+        setError("Error al obtener los modulos");
+        throw error;
+
+    } finally {
+        setLoading(false);
     }
+}
 
     const fetchModuleById = async (id: number) => {
         try {
@@ -222,29 +228,35 @@ export const useCourses = () => {
         }
     }
 
-    const fetchModulesByCourse = async (courseId: number) => {
-        try {
-            setLoading(true);
-            setError(null);
+const fetchModulesByCourse = async (courseId: number): Promise<Module[]> => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const data = await getModulesByCourse(courseId);
-            setModules(data);
-        } catch (error) {
-            setError("Error al obtener los modulos del curso")
-            throw error;
-        } finally {
-            setLoading(false);
-        }
+        const data = await getModulesByCourse(courseId);
+        setModules(data);
+
+        return data;
+
+    } catch (error) {
+        setError("Error al obtener los modulos del curso")
+        throw error;
+
+    } finally {
+        setLoading(false);
     }
+}
 
     // LESSONS
-    const fetchLessons = async () => {
+    const fetchLessons = async (): Promise<Lesson[]> => {
         try {
             setLoading(true);
             setError(null);
 
             const data = await getLessons();
             setLessons(data);
+
+            return data
         } catch (error) {
             setError("Error al obtener la leccion");
             throw error;
@@ -253,21 +265,24 @@ export const useCourses = () => {
         }
     }
 
-    const fetchLessonById = async (id: number) => {
-        try {
-            setLoading(true);
-            setError(null);
+const fetchLessonById = async (id: number): Promise<Lesson> => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const data = await getLessonById(id);
-            setLesson(data);
-        } catch (error) {
-            setError("Error al obtener las lecciones");
-            throw error;
+        const data = await getLessonById(id);
+        setLesson(data);
 
-        } finally {
-            setLoading(false);
-        }
+        return data;
+
+    } catch (error) {
+        setError("Error al obtener las lecciones");
+        throw error;
+
+    } finally {
+        setLoading(false);
     }
+}
 
     const createLesson = async (lessonData: LessonDTOCreate) => {
         try {

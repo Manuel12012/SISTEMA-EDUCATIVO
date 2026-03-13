@@ -50,9 +50,13 @@ const handleEditClick = (user: User) => {
     fetchUsers();
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+  if (Array.isArray(users)) {
     setDisplayedUsers(users);
-  }, [users]);
+  } else {
+    setDisplayedUsers([]);
+  }
+}, [users]);
 
   if (loading)
     return (

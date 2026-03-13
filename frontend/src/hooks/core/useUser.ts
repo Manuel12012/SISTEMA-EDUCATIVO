@@ -23,7 +23,7 @@ export const useUser = () => {
             setError(null);
 
             const data = await getUsers();
-            setUsers(data);
+            setUsers(data.data);
         } catch (error) {
             setError("Error al obtener los usuarios");
             throw error;
