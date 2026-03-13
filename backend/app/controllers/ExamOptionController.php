@@ -43,8 +43,7 @@ class ExamOptionController
     {
         if (
             !isset($data["question_id"]) ||
-            empty($data["opcion"]) ||
-            !isset($data["es_correcta"])
+            empty($data["opcion"]) 
         ) {
             Response::json([
                 "error" => "Datos incompletos"

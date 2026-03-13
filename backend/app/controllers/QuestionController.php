@@ -5,7 +5,7 @@ require_once __DIR__ . '/../core/Response.php';
 
 class QuestionController
 {
-        public static function allWithOptionsCount()
+    public static function allWithOptionsCount()
     {
         $options = Question::allWithOptionsCount();
 
@@ -29,10 +29,10 @@ class QuestionController
 
         $OptionsByQuestion = Question::getOptionsByQuestions($questionId);
 
-        if(!$OptionsByQuestion){
+        if (!$OptionsByQuestion) {
             Response::json([
-                "error"=> "Opcion no encontrada"
-            ],404);
+                "error" => "Opcion no encontrada"
+            ], 404);
         }
 
         Response::json($OptionsByQuestion);
@@ -71,8 +71,7 @@ class QuestionController
         // si no existen esos campos entonces mandamos un response con datos incompletos
         if (
             empty($data["exam_id"]) ||
-            empty($data["pregunta"]) ||
-            !isset($data["correct_option_id"])
+            empty($data["pregunta"])
         ) {
             Response::json([
                 "error" => "Datos incompletos"

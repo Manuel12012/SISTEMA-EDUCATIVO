@@ -37,7 +37,7 @@ const ExamPage = () => {
   const handleEditClick = (exam: Exam) => {
     setEditingResultId(exam.id);
     setFormData({
-      course_id: exam.course_id, // ✅ ahora sí funciona
+      course_id: exam.course_id, // ahora sí funciona
       titulo: exam.titulo,
       duracion_minutos: exam.duracion_minutos,
     });
