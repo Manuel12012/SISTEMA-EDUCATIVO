@@ -38,7 +38,11 @@ class UserController
 
     public static function index()
     {
-        $user = User::all();
+
+        $page = $_GET["page"] ?? 1;
+        $limit = $_GET["limit"] ?? 10;
+
+        $user = User::paginate($page, $limit);
 
         if (empty($user)) {
             Response::json(

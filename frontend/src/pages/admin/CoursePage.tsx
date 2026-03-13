@@ -79,29 +79,23 @@ const CoursePage = () => {
     <div className="p-6 min-h-screen flex flex-col">
       {" "}
       <div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Administrador de Cursos
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-800">Cursos</h1>
+
         <p className="text-gray-500 text-sm">
-          Visualiza los cursos, actualizalos, eliminalos o crea uno
+          Administra los cursos del sistema educativo{" "}
         </p>
       </div>
       <div className="flex justify-between items-center mb-4">
         {" "}
         <button
-          className=" rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
           onClick={() => {
             setEditingResultId(null);
-            setFormData({
-              titulo: "",
-              descripcion: "",
-              grado: "primaria",
-              imagen_url: "",
-            });
             setIsModalOpen(true);
           }}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition"
         >
-          <MdCreateNewFolder />
+          <MdCreateNewFolder size={20} />
+          Crear Curso
         </button>
         <div className="flex gap-2 items-center">
           {/*INPUT DE BUSQUEDA ID */}
@@ -113,12 +107,12 @@ const CoursePage = () => {
             onChange={(e) =>
               setSearchId(e.target.value === "" ? "" : Number(e.target.value))
             }
-            className="border px-2 py-2 rounded w-32"
+            className="border border-gray-200 px-4 py-2 rounded-lg w-56 focus:ring-2 focus:ring-blue-400 outline-none"
           />
           {/*BOTON DE BUSCAR */}
 
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
             onClick={async () => {
               if (searchId !== "") {
                 const result = await fetchCourseById(searchId);
@@ -136,7 +130,7 @@ const CoursePage = () => {
           </button>
           {/*BOTON DE RESET */}
           <button
-            className=" rounded bg-gray-300 px-4 py-2 text-white hover:bg-gray-400"
+            className="text-gray-500 hover:text-gray-700 text-sm"
             onClick={() => {
               setSearchId("");
               fetchCourses();
@@ -157,19 +151,17 @@ const CoursePage = () => {
         {displayedCourses.map((c) => (
           <div
             key={c.id}
-            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100
-      transition-transform duration-300 hover:-translate-y-1 hover:scale-102 flex flex-col"
+            className="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg flex flex-col hover:scale-[1.02]
+transition-all duration-200"
           >
             <img
               src={`http://localhost:8000${c.imagen_url}`}
               alt={c.titulo}
-              className="w-full h-32 object-cover"
+              className="w-full h-40 object-cover"
             />
 
             <div className="p-3 flex flex-col gap-2 flex-1">
-              <p className="font-semibold text-sm text-gray-800 truncate">
-                {c.titulo}
-              </p>
+              <p className="font-semibold text-gray-800 text-sm">{c.titulo}</p>
 
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <svg
@@ -208,19 +200,19 @@ const CoursePage = () => {
               </div>
 
               {/* badge grado */}
-              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full w-fit capitalize">
+              <span className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded-md w-fit capitalize">
                 {c.grado}
               </span>
 
               <div className="flex justify-between items-center pt-1 mt-auto">
                 <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                  className="text-blue-500 hover:text-blue-700"
                   onClick={() => handleEditClick(c)}
                 >
                   Editar
                 </button>
                 <button
-                  className="bg-red-400 text-white px-2 py-1 rounded text-xs hover:bg-red-500"
+                  className="text-red-500 hover:text-red-700"
                   onClick={async () => {
                     try {
                       await deleteCourse(c.id);
@@ -360,9 +352,10 @@ const CoursePage = () => {
         )}
       </div>
       <div className="mt-10">
-        <div className="bg-blue-400 w-fit text-white px-4 py-2 rounded">
-          <label>Lecciones en total:</label>
-          <div className="text-md text-center">{lessons.length}</div>
+        <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4 w-48">
+          <p className="text-sm text-gray-500">Lecciones totales</p>
+
+          <p className="text-2xl font-bold text-blue-500">{lessons.length}</p>
         </div>
       </div>
     </div>

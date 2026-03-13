@@ -10,8 +10,8 @@ class Course extends Model
     {
         $db = Database::connect();
         $stmt = $db->prepare(
-            "SELECT * FROM courses"
-        );
+            "SELECT * FROM "
+        . self::$table);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
