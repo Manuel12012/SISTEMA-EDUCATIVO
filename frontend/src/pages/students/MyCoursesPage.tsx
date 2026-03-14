@@ -123,7 +123,7 @@ const handleSearch = () => {
               <h3 className="font-semibold text-gray-800">{course.titulo}</h3>
 
               <p
-                onClick={() => navigate(`/admin/courses/${course.id}/modules`)}
+                onClick={() => navigate(`/student/courses/${course.id}/modules`)}
                 className="text-xs text-gray-500 cursor-pointer"
               >
                 {course.modules_count} modulos
