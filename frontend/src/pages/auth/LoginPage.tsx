@@ -1,11 +1,10 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import { useAuthContext } from "../../hooks/auth/useAuthContext";
+import {useAuthContext} from "../../hooks/auth/useAuthContext";
 
 export const LoginPage = () => {
-
-  // extraemos el metodo login para usarlo 
-const { login } = useAuthContext();
+  // extraemos el metodo login para usarlo
+  const {login} = useAuthContext();
   // creamos el metodo navigate para navegar entre paginas
   const navigate = useNavigate();
 
@@ -19,15 +18,30 @@ const { login } = useAuthContext();
     e.preventDefault();
 
     try {
-      // llamamos al metodo login de nuestro hook y le pasamos email y password  
+      // llamamos al metodo login de nuestro hook y le pasamos email y password
       const response = await login({email, password});
 
       // si el token existe en la respuesta entonces navegamos a courses
       if (response.token) {
-        navigate("/admin/results");
+        switch (response.user.rol) {
+          case "admin":
+            navigate("/admin/results");
+            break;
+
+          case "estudiante":
+            navigate("/student/myCourses");
+            break;
+
+          case "docente":
+            navigate("/teacher/courses");
+            break;
+
+          default:
+            navigate("/login");
+        }
       }
     } catch (error) {
-        // mandamos error
+      // mandamos error
       console.error("Error al iniciar sesión");
     }
   };

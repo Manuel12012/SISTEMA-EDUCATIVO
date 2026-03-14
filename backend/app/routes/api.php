@@ -27,9 +27,12 @@ Router::post('badges', [BadgeController::class, 'store']);
 // COURSES
 Router::get('courses', [CourseController::class, 'allWithModulesCount']);
 Router::get('courses/{id}', [CourseController::class, 'show']);
-Router::post('courses', [CourseController::class, 'store'],[function(){$user = AuthMiddleware::verify(); RoleMiddleware::handle($user,["admin"]);}]);
+Router::post('courses', [CourseController::class, 'store'], [function () {
+    $user = AuthMiddleware::verify();
+    RoleMiddleware::handle($user, ["admin"]);
+}]);
 
-Router::middleware(["auth", "admin"])->group(function(){
+Router::middleware(["auth", "admin"])->group(function () {
     Router::post("courses", [CourseController::class, "store"]);
 });
 
@@ -112,7 +115,9 @@ Router::put('users/{id}', [UserController::class, 'update']);
 Router::delete('users/{id}', [UserController::class, 'destroy']);
 Router::get('users/{userId}/results', [UserController::class, 'resultsByUser']);
 Router::post('login', [UserController::class, 'login']);
-Router::get('me', [UserController::class, 'me'],[function(){ AuthMiddleware::verify();}]);
+Router::get('me', [UserController::class, 'me'], [function () {
+    AuthMiddleware::verify();
+}]);
 
 
 
@@ -120,5 +125,5 @@ Router::get('me', [UserController::class, 'me'],[function(){ AuthMiddleware::ver
 Router::post('exams/{id}/submit', [ExamController::class, 'submit']);
 
 //COURSE ENROLLMENTS
-Router::post('enrollment/user/{userId}/course/{courseId}', [EnrollmentController::class, 'enroll']);
+Router::post('enrollments', [EnrollmentController::class, 'enroll']);
 Router::get('enrollment/user/{userId}', [EnrollmentController::class, 'myCourses']);

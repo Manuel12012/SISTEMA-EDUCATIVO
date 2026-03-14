@@ -17,12 +17,10 @@ export const useExamResults = () => {
         try {
             setLoading(true);
             setError(null);
-            console.log("Fetching results...");
             const data = await getResults();
             setExamResults(data);
 
         } catch (error) {
-            console.error("ERROR REAL:", error);
             setError("Error al obtener los resultados");
         } finally {
             setLoading(false);

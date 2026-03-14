@@ -6,35 +6,39 @@ class CourseEnrollment extends Model
 {
     protected static string $table = 'course_enrollments';
 
-    public static function enroll(int $userId, int $courseId)
-    {
-        $db = Database::connect();
+public static function enroll(int $userId, int $courseId)
+{
+    $db = Database::connect();
 
-        // Verificar si ya está inscrito
+        // Revisar si ya está inscrito
         $check = $db->prepare(
-            "SELECT id FROM course_enrollments 
-                WHERE user_id = :user_id AND course_id = :course_id"
+            "SELECT id FROM course_enrollments
+             WHERE user_id = :user_id AND course_id = :course_id"
         );
-
         $check->execute([
-            "user_id" => $userId,
-            "course_id" => $courseId
+            ":user_id" => $userId,
+            ":course_id" => $courseId
         ]);
 
         if ($check->fetch()) {
             return false; // ya inscrito
         }
 
+        // Insertar nueva inscripción
         $stmt = $db->prepare(
             "INSERT INTO course_enrollments (user_id, course_id)
-                VALUES (:user_id, :course_id)"
+             VALUES (:user_id, :course_id)"
         );
 
-        return $stmt->execute([
-            "user_id" => $userId,
-            "course_id" => $courseId
-        ]);
-    }
+        if ($stmt->execute([
+            ":user_id" => $userId,
+            ":course_id" => $courseId
+        ])) {
+            return (int) $db->lastInsertId();
+        }
+
+        return false;
+}
 
     public static function getUserCourses(int $userId)
     {

@@ -6,51 +6,36 @@ require_once __DIR__ . '/../core/Response.php';
 
 class EnrollmentController
 {
-    public static function enroll($data)
+ public static function enroll()
     {
-        if (
-            empty($data["user_id"]) ||
-            empty($data["course_id"])
-        ) {
-            Response::json([
-                "error" => "Datos incompletos"
-            ], 400);
+        // Leer JSON del body
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $userId = $data['user_id'] ?? null;
+        $courseId = $data['course_id'] ?? null;
+
+        // Validaciones
+        if (empty($userId) || empty($courseId)) {
+            Response::json(["error" => "Datos incompletos"], 400);
             return;
         }
 
-        if (
-            !is_numeric($data["user_id"]) ||
-            !is_numeric($data["course_id"])
-        ) {
-            Response::json([
-                "error" => "IDs invalidos"
-            ], 400);
+        if (!is_numeric($userId) || !is_numeric($courseId)) {
+            Response::json(["error" => "IDs invalidos"], 400);
             return;
         }
 
-        $course = Course::find((int)$data["course_id"]);
+        // Crear inscripción
+        $enrollmentId = CourseEnrollment::enroll((int)$userId, (int)$courseId);
 
-        if (!$course) {
-            Response::json([
-                "error" => "Curso no encontrado"
-            ], 404);
-            return;
-        }
-
-        $enrolled = CourseEnrollment::enroll(
-            (int)$data["user_id"],
-            (int)$data["course_id"]
-        );
-
-        if (!$enrolled) {
-            Response::json([
-                "error" => "El usuario ya esta inscrito"
-            ], 409);
+        if (!$enrollmentId) {
+            Response::json(["error" => "El usuario ya está inscrito o no se pudo crear"], 409);
             return;
         }
 
         Response::json([
-            "message" => "Inscripcion exitosa"
+            "message" => "Inscripción exitosa",
+            "id" => $enrollmentId
         ], 201);
     }
 

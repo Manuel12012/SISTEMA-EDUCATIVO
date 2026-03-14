@@ -6,7 +6,7 @@ import {
   FaHome,
   FaUser,
 } from "react-icons/fa";
-import { useAuthContext } from "../hooks/auth/useAuthContext";
+import { useAuthContext } from "../../hooks/auth/useAuthContext";
 
 const Sidebar = () => {
   const {logout} = useAuthContext();

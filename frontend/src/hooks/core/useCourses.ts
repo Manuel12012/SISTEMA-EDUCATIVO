@@ -18,6 +18,8 @@ import {
     updateLesson as updateLessonService, deleteLesson as deleteLessonService,
     getLessonsByModule
 } from "../../services/lessons.service";
+import type { Enrollment } from "../../types/Enrollment";
+import { myCourses } from "../../services/Enrollments.service";
 
 
 
@@ -25,6 +27,7 @@ export const useCourses = () => {
     // COURSES
     const [courses, setCourses] = useState<Course[]>([]);
     const [course, setCourse] = useState<Course | null>(null);
+    const [courseStudent, setCourseStudent] = useState<Enrollment[]>([]);
 
     // MODULES
     const [modules, setModules] = useState<Module[]>([]);
@@ -40,25 +43,42 @@ export const useCourses = () => {
 
     // COURSES METHODS
 
-const fetchCourses = async (): Promise<Course[]> => {
-    try {
-        setLoading(true);
-        setError(null);
+    const fetchCourses = async (): Promise<Course[]> => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        const data = await getCourses();
+            const data = await getCourses();
 
-        setCourses(data);
+            setCourses(data);
 
-        return data; // 👈 FALTABA ESTO
+            return data; // 👈 FALTABA ESTO
 
-    } catch (error) {
-        setError("Error al obtener los cursos")
-        throw error;
+        } catch (error) {
+            setError("Error al obtener los cursos")
+            throw error;
 
-    } finally {
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
-}
+
+    const fetchCoursesByStudent = async (userId: number) => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await myCourses(userId);
+
+            setCourses(data); return data;
+        } catch (error) {
+            setError("Error al obtener el curso del estudiante");
+            throw (error);
+
+        } finally {
+            setLoading(false);
+        }
+    }
     const uploadImageHandler = async (file: File) => {
         try {
             setLoading(true);
@@ -143,24 +163,24 @@ const fetchCourses = async (): Promise<Course[]> => {
     }
 
     // MODULES METHODS
-const fetchModules = async (): Promise<Module[]> => {
-    try {
-        setLoading(true);
-        setError(null);
+    const fetchModules = async (): Promise<Module[]> => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        const data = await getModules();
-        setModules(data);
+            const data = await getModules();
+            setModules(data);
 
-        return data;
+            return data;
 
-    } catch (error) {
-        setError("Error al obtener los modulos");
-        throw error;
+        } catch (error) {
+            setError("Error al obtener los modulos");
+            throw error;
 
-    } finally {
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
-}
 
     const fetchModuleById = async (id: number) => {
         try {
@@ -228,24 +248,24 @@ const fetchModules = async (): Promise<Module[]> => {
         }
     }
 
-const fetchModulesByCourse = async (courseId: number): Promise<Module[]> => {
-    try {
-        setLoading(true);
-        setError(null);
+    const fetchModulesByCourse = async (courseId: number): Promise<Module[]> => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        const data = await getModulesByCourse(courseId);
-        setModules(data);
+            const data = await getModulesByCourse(courseId);
+            setModules(data);
 
-        return data;
+            return data;
 
-    } catch (error) {
-        setError("Error al obtener los modulos del curso")
-        throw error;
+        } catch (error) {
+            setError("Error al obtener los modulos del curso")
+            throw error;
 
-    } finally {
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
-}
 
     // LESSONS
     const fetchLessons = async (): Promise<Lesson[]> => {
@@ -265,24 +285,24 @@ const fetchModulesByCourse = async (courseId: number): Promise<Module[]> => {
         }
     }
 
-const fetchLessonById = async (id: number): Promise<Lesson> => {
-    try {
-        setLoading(true);
-        setError(null);
+    const fetchLessonById = async (id: number): Promise<Lesson> => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        const data = await getLessonById(id);
-        setLesson(data);
+            const data = await getLessonById(id);
+            setLesson(data);
 
-        return data;
+            return data;
 
-    } catch (error) {
-        setError("Error al obtener las lecciones");
-        throw error;
+        } catch (error) {
+            setError("Error al obtener las lecciones");
+            throw error;
 
-    } finally {
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
-}
 
     const createLesson = async (lessonData: LessonDTOCreate) => {
         try {
@@ -332,21 +352,21 @@ const fetchLessonById = async (id: number): Promise<Lesson> => {
         }
     }
 
-const fetchLessonsByModule = async (moduleId: number) => {
-    try {
-        setLoading(true);
-        setError(null);
+    const fetchLessonsByModule = async (moduleId: number) => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        const data = await getLessonsByModule(moduleId);
-        setLessons(data);
-        return data; // 👈 agrega esto
-    } catch (error) {
-        setError("Error al obtener la leccion");
-        throw error;
-    } finally {
-        setLoading(false);
+            const data = await getLessonsByModule(moduleId);
+            setLessons(data);
+            return data; // 👈 agrega esto
+        } catch (error) {
+            setError("Error al obtener la leccion");
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     }
-}
 
     return {
         courses,
@@ -364,6 +384,7 @@ const fetchLessonsByModule = async (moduleId: number) => {
         updateCourse,
         deleteCourse,
         uploadImageHandler,
+        fetchCoursesByStudent,
         // modules
         fetchModules,
         fetchModuleById,

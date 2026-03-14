@@ -13,7 +13,7 @@ class ExamResultController
 
         if (empty($examResult)) {
             Response::json([
-                "error" => "No se encontro el resultado"
+               
             ], 200);
             return;
         }
