@@ -39,8 +39,6 @@ const ModulePage = () => {
 
   const [courseTitle, setCourseTitle] = useState<string>("");
 
-  const {fetchCourseById} = useCourses();
-
   const [leccionesPorModulo, setLeccionesPorModulo] = useState<
     Record<number, Lesson[]>
   >({});
@@ -60,7 +58,7 @@ const ModulePage = () => {
       }
     >
   >({}); // Falta implmentar hooks de Lessons
-  const {fetchLessonsByModule, createLesson, updateLessons} = useCourses();
+  const {fetchCourseById, fetchLessonsByModule, createLesson, updateLessons} = useCourses();
 
   const [displayedModules, setDisplayedModules] = useState<Module[]>([]);
 
