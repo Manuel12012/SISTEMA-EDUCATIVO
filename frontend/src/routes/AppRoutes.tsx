@@ -12,6 +12,7 @@ import {LoginPage} from "../pages/auth/LoginPage";
 import {ProtectedRoute} from "./ProtectedRoute";
 import MyCoursesPage from "../pages/students/MyCoursesPage";
 import StudentLayout from "../layouts/student/StudentLayout";
+import MyModulesPage from "../pages/students/MyModulesPage";
 
 export default function AppRoutes() {
   return (
@@ -47,6 +48,8 @@ export default function AppRoutes() {
 
       <Route element={<StudentLayout />}>
         <Route path="/student/myCourses" element={<MyCoursesPage />} />
+        <Route path="/student/myCourses/:courseId/myModules" element={<MyModulesPage />} />
+
       </Route>
     </Routes>
   );
