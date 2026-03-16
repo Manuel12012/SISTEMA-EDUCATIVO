@@ -2,10 +2,12 @@
 
 require_once __DIR__ . '/../core/Model.php';
 
-class Module extends Model {
+class Module extends Model
+{
     protected static string $table = 'modules';
 
-    public static function getByCourse(int $courseId) {
+    public static function getByCourse(int $courseId)
+    {
         $db = Database::connect();
         $stmt = $db->prepare(
             "SELECT * FROM modules WHERE course_id = :id"
@@ -14,29 +16,30 @@ class Module extends Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-public static function getByLesson(int $lessonId) {
-    $db = Database::connect();
-    $stmt = $db->prepare("
+    public static function getByLesson(int $lessonId)
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare("
         SELECT m.*
         FROM modules m
         JOIN lessons l ON l.module_id = m.id
         WHERE l.id = :id
     ");
-    $stmt->execute(['id' => $lessonId]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-    public static function find(int $moduleId)
-    {
-                $db = Database::connect();
-        $stmt = $db->prepare(
-            "SELECT * FROM modules WHERE id = :id"
-        );
-        $stmt->execute(["id"=> $moduleId]);
+        $stmt->execute(['id' => $lessonId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-        public static function create($data)
+    public static function find(int $moduleId)
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            "SELECT * FROM modules WHERE id = :id"
+        );
+        $stmt->execute(["id" => $moduleId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public static function create($data)
     { // $data contiene los datos de la pregunta a insertar
         $db = Database::connect();
         $stmt = $db->prepare(
@@ -77,5 +80,4 @@ public static function getByLesson(int $lessonId) {
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $moduleId]);
     }
-
 }

@@ -74,3 +74,8 @@ export const submitExam = async (
   const { data } = await api.post(`/exams/${id}/submit`, { answers });
   return data;
 };
+
+export const getExamsByCourse = async(id:number): Promise<Exam[]> =>{
+    const {data} = await api.get<Exam[]>(`/courses/${id}/exams`);
+    return data;
+}

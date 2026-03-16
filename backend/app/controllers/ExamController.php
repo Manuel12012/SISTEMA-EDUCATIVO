@@ -300,4 +300,26 @@ public static function submit($examId, $data = null)
             "questions" => $filteredQuestions
         ]);
     }
+
+    public static function getByCourse($courseId){
+
+    if(!is_numeric($courseId)){
+        Response::json([
+            "error" => "Id del curso invalido"
+        ],400);
+        return;
+    }
+
+    $courses = Course::find($courseId);
+
+    if(!$courses){
+        Response::json([
+            "error" => "Curso no encontrado"
+        ],404);
+        return;
+    }
+
+    $exams = Exam::getExamByCourse($courseId);
+    Response::json($exams);
+    }
 }

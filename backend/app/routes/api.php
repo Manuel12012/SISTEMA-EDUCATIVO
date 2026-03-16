@@ -50,7 +50,7 @@ Router::delete('exams/{id}', [ExamController::class, 'destroy']);
 Router::get('exams/{id}/results', [ExamController::class, 'results']);
 Router::get('exams/{id}/questions', [ExamController::class, 'getQuestionsByExam']);
 Router::get('exams/{id}/take', [ExamController::class, 'take']);
-
+Router::get('courses/{courseId}/exams', [ExamController::class, 'getByCourse']);
 
 // EXAM OPTIONS
 Router::get('exam-options', [ExamOptionController::class, 'index']);
@@ -118,8 +118,6 @@ Router::post('login', [UserController::class, 'login']);
 Router::get('me', [UserController::class, 'me'], [function () {
     AuthMiddleware::verify();
 }]);
-
-
 
 // SUBMIT EXAMS
 Router::post('exams/{id}/submit', [ExamController::class, 'submit']);

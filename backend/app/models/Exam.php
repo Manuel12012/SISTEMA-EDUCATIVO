@@ -155,35 +155,50 @@ GROUP BY
     }
 
     public static function findActive(int $examId): ?array
-{
-    $db = Database::connect();
+    {
+        $db = Database::connect();
 
-    $stmt = $db->prepare("
+        $stmt = $db->prepare("
         SELECT id, titulo, duracion_minutos
         FROM exams
         WHERE id = :id
         AND activo = 1
     ");
 
-    $stmt->execute(["id" => $examId]);
+        $stmt->execute(["id" => $examId]);
 
-    $exam = $stmt->fetch(PDO::FETCH_ASSOC);
+        $exam = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $exam ?: null;
-}
+        return $exam ?: null;
+    }
 
-public static function getQuestionsForTake(int $examId): array
-{
-    $db = Database::connect();
+    public static function getQuestionsForTake(int $examId): array
+    {
+        $db = Database::connect();
 
-    $stmt = $db->prepare("
+        $stmt = $db->prepare("
         SELECT id, pregunta
         FROM questions
         WHERE exam_id = :exam_id
     ");
 
-    $stmt->execute(["exam_id" => $examId]);
+        $stmt->execute(["exam_id" => $examId]);
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public static function getExamByCourse($courseId)
+    {
+        $db = Database::connect();
+
+        $stmt = $db->prepare(
+            "
+        SELECT e.*
+        FROM exams e
+        JOIN courses c ON c.id = e.course_id
+        WHERE c.id = :id"
+        );
+        $stmt->execute(["id" => $courseId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

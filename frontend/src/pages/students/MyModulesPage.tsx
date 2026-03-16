@@ -4,6 +4,9 @@ import {useEffect, useState} from "react";
 import {useCourses} from "../../hooks/core/useCourses";
 import type {Lesson} from "../../types/lesson";
 import type {Module} from "../../types/module";
+import {FaArrowLeft, FaTrash, FaRedo, FaSearch} from "react-icons/fa";
+import {useExams} from "../../hooks/admin/useExams";
+import type {Exam} from "../../types/exam";
 
 const MyModulesPage = () => {
   // recibimos el id
@@ -19,6 +22,8 @@ const MyModulesPage = () => {
     fetchModules,
     fetchModulesByCourse,
   } = useModule();
+
+  const {exams, getByCourse} = useExams();
 
   const [leccionesVisibles, setLeccionesVisibles] = useState<Set<number>>(
     new Set(),
@@ -36,15 +41,22 @@ const MyModulesPage = () => {
 
   const [displayedModules, setDisplayedModules] = useState<Module[]>([]);
 
+  const [displayedExams, setDisplayedExams] = useState<Exam[]>([]);
+
   // useEffect
   useEffect(() => {
     if (!courseId) return;
 
-    fetchCourseById(Number(courseId)).then((course) => {
+    const id = Number(courseId);
+
+    fetchCourseById(id).then((course) => {
       if (course) setCourseTitle(course.titulo);
     });
 
-    fetchModulesByCourse(Number(courseId));
+    fetchModulesByCourse(id);
+
+    // aquí cargamos los examenes
+    getByCourse(id);
   }, [courseId]);
 
   // useEffect
@@ -52,6 +64,9 @@ const MyModulesPage = () => {
     setDisplayedModules(modules);
   }, [modules]);
 
+  useEffect(() => {
+    setDisplayedExams(exams);
+  }, [exams]);
   // manejo de errores
   if (error)
     return (
@@ -91,18 +106,173 @@ const MyModulesPage = () => {
             </p>
           </div>
         </div>
-
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <button
-          className="rounded bg-green-400 px-4 py-2 text-white hover:bg-green-500"
-          onClick={()=>{
-            se
-          }}  
-        >   
+        <div></div>
+        <div className="flex gap-2 items center">
+          <input
+            type="number"
+            placeholder="Buscar por ID"
+            value={searchId}
+            onChange={(e) =>
+              //Si cambia entonces el valor sera ahora el que se ingresara por input
+              setSearchId(e.target.value === "" ? "" : Number(e.target.value))
+            }
+            className="border px-2 py-2 rounded w-32"
+          />
 
-        </button>
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={() => {
+              // Si SearchId no es un string vacio entonces:
+              if (searchId !== "") {
+                // Buscamos en find, aquellos que coincidan con el id de search
+                const result = modules.find((q) => q.id === searchId);
+
+                // Si existe entonces traemos el resultado en array si no array vacio
+                setDisplayedModules(result ? [result] : []);
+              } else {
+                //Si es vacio entonces mostramos todas las questions (metodo All de Hook)
+                setDisplayedModules(modules);
+              }
+            }}
+          >
+            <FaSearch />
+          </button>
+
+          <button
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+            onClick={() => {
+              setSearchId("");
+              fetchModulesByCourse(Number(courseId)); // trae solo los del curso actual
+            }}
+          >
+            <FaRedo />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <h2 className="text-xl font-semibold">Modulos del curso</h2>
+
+        {displayedModules.map((m) => (
+          <div key={m.id} className="flex justify-between gap-5 w-full">
+            <div className="flex flex-col bg-gray-200 p-4 gap-3 rounded text-md w-full">
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <p className="text-sm text-gray-500">Modulo {m.id}</p>
+                  <label className="font-semibold text-gray-800">
+                    {m.titulo}
+                  </label>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    className="bg-purple-400 text-white rounded px-4 py-2"
+                    onClick={async () => {
+                      if (leccionesVisibles.has(m.id)) {
+                        setLeccionesVisibles((prev) => {
+                          const next = new Set(prev);
+                          next.delete(m.id);
+                          return next;
+                        });
+                        return;
+                      }
+
+                      try {
+                        if (!leccionesPorModulo[m.id]) {
+                          const lessons = await fetchLessonsByModule(m.id);
+
+                          setLeccionesPorModulo((prev) => ({
+                            ...prev,
+                            [m.id]: lessons ?? [],
+                          }));
+                        }
+                        setLeccionesVisibles((prev) => new Set(prev).add(m.id));
+                      } catch (error) {
+                        console.error(error);
+                      }
+                    }}
+                  >
+                    {leccionesVisibles.has(m.id)
+                      ? "Ocultar lecciones"
+                      : "Mostrar lecciones"}
+                  </button>
+                </div>
+              </div>
+              {leccionesVisibles.has(m.id) && (
+                <div className="mt-4 bg-white rounded p-4 shadow-sm">
+                  <h3 className="font-semibold mb-2 text-gray-700">
+                    Lecciones:
+                  </h3>
+
+                  {leccionesPorModulo[m.id]?.length === 0 && (
+                    <p className="text-gray-400 text-sm">
+                      No hay lecciones registradas
+                    </p>
+                  )}
+
+                  {leccionesPorModulo[m.id]?.map((opt) => (
+                    <div
+                      key={opt.id}
+                      className="flex gap-2 items-center border rounded p-2 mb-2"
+                      onClick={() => {}}
+                    >
+                      <div className="">{opt.id}</div>
+                      {".-"}
+                      <div className="">{opt.titulo}</div>
+                      <div className="ml-auto">
+                        <button
+                          className="bg-blue-400 px-2 py-1 text-white rounded"
+                          onClick={() =>
+                            navigate(
+                              `/admin/courses/${courseId}/modules/${m.id}/lessons/${opt.id}`,
+                            )
+                          }
+                        >
+                          Ir
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex justify-center bg-blue-500 rounded "></div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        <div className="flex flex-col gap-4 mt-6">
+          <h2 className="text-xl font-semibold">Exámenes del curso</h2>
+
+          {displayedExams.length === 0 && (
+            <p className="text-gray-400">No hay exámenes en este curso</p>
+          )}
+
+          {displayedExams.map((e) => (
+            <div
+              key={e.id}
+              className="flex justify-between items-center bg-gray-200 p-4 rounded"
+            >
+              <div>
+                <p className="text-sm text-gray-500">Examen {e.id}</p>
+
+                <h3 className="font-semibold">{e.titulo}</h3>
+              </div>
+
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                onClick={() => {
+                  navigate(`/exams/${e.id}/take`);
+                }}
+              >
+                Tomar examen
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
