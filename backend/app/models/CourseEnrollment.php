@@ -58,4 +58,20 @@ public static function enroll(int $userId, int $courseId)
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public static function getStudentsByCourse($courseId) {
+        $db = Database::connect();
+
+        $stmt = $db->prepare("
+            SELECT u.id, u.nombre, u.email
+            FROM users u
+            JOIN course_enrollments ce ON ce.user_id = u.id
+            WHERE ce.course_id = ?
+            AND ce.status = 'active'
+        ");
+
+        $stmt->execute([$courseId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

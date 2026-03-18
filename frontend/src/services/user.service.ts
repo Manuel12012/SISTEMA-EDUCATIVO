@@ -2,10 +2,7 @@ import { api } from "./api";
 import type { LoginResponse, MeResponse, User, UserDTOCreate, UserLogin, UsersResponse } from "../types/user"
 import type { ExamResult } from "../types/examResult";
 
-export const getUsers = async (): Promise<UsersResponse> => {
-  const response = await api.get("/users");
-  return response.data;
-};
+
 
 export const getUserById = async (id: number): Promise<User> => {
     const { data } = await api.get<User>(`/users/${id}`);
@@ -47,4 +44,15 @@ export const loginUser = async (
 
     return data;
 };
+
+export const getUsers = async (params?: {
+    role?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const { data } = await api.get("/users", {
+      params, // 🔥 axios arma el query string automáticamente
+    });
+    return data;
+  };
 

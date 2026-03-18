@@ -1,10 +1,11 @@
 import { useState } from "react";
-import type { Course, CourseDTOCreate } from "../../types/course";
+import type { Course, CourseDTOCreate, getStudents, student } from "../../types/course";
 import {
     getCourseById, getCourses, createCourse as createCourseService
     , updateCourse as updateCourseService
     , deleteCourse as deleteCourseService
-    , uploadCourseImage
+    , uploadCourseImage,
+    getStudentsByCourse
 } from "../../services/courses.service";
 import type { Module } from "../../types/module";
 import type { Lesson, LessonDTOCreate } from "../../types/lesson";
@@ -20,6 +21,7 @@ import {
 } from "../../services/lessons.service";
 import type { Enrollment } from "../../types/Enrollment";
 import { myCourses } from "../../services/Enrollments.service";
+import type { User } from "../../types/user";
 
 
 
@@ -28,6 +30,7 @@ export const useCourses = () => {
     const [courses, setCourses] = useState<Course[]>([]);
     const [course, setCourse] = useState<Course | null>(null);
     const [courseStudent, setCourseStudent] = useState<Enrollment[]>([]);
+    const [students, setStudents] = useState<student[]>([]);
 
     // MODULES
     const [modules, setModules] = useState<Module[]>([]);
@@ -158,6 +161,22 @@ export const useCourses = () => {
             setError("Error al eliminar el curso")
             throw error;
         } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchStudentsByCourse = async(id:number) =>{
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getStudentsByCourse(id);
+            setStudents(data.data);
+            return data;
+        } catch (error) {
+            setError("Error al obtener los alumnos");
+            throw error;
+        } finally{
             setLoading(false);
         }
     }
@@ -377,6 +396,7 @@ export const useCourses = () => {
         lesson,
         loading,
         error,
+        students,
         // courses
         fetchCourses,
         fetchCourseById,
@@ -385,6 +405,7 @@ export const useCourses = () => {
         deleteCourse,
         uploadImageHandler,
         fetchCoursesByStudent,
+        fetchStudentsByCourse,
         // modules
         fetchModules,
         fetchModuleById,

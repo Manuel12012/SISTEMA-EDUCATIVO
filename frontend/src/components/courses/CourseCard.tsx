@@ -11,7 +11,8 @@ const CourseCard = ({course, onEdit, onDelete}: Props) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col"
+    onClick={()=>navigate(`/admin/courses/${course.id}`)}>
       <img
         src={`http://localhost:8000${course.imagen_url}`}
         className="w-full h-40 object-cover"

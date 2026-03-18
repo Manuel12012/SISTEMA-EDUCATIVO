@@ -541,6 +541,12 @@ const ModulePage = () => {
           </div>
         )}
       </div>
+      <button
+  onClick={() => navigate(`/admin/courses/${courseId}/students`)}
+  className="bg-blue-500 text-white px-4 py-2 rounded"
+>
+  Ver estudiantes
+</button>
     </div>
   );
 };

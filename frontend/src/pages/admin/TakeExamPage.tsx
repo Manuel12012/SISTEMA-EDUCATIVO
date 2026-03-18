@@ -1,13 +1,16 @@
-import {useEffect, useState} from "react";
-import {submitExam, takeExam} from "../../services/exams.service";
-import {useParams} from "react-router-dom";
-const takeExamPage = () => {
+import { useEffect, useState } from "react";
+import { submitExam, takeExam } from "../../services/exams.service";
+import { useParams } from "react-router-dom";
+
+const TakeExamPage = () => {
   const [exam, setExam] = useState<any>(null);
-  const [answers, setAnswers] = useState<{[key: number]: number}>({});
+  const [answers, setAnswers] = useState<{ [key: number]: number }>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const {id} = useParams<{id: string}>();
+
+  const { id } = useParams<{ id: string }>();
+
   useEffect(() => {
     const fetchExam = async () => {
       try {
@@ -33,23 +36,16 @@ const takeExamPage = () => {
   const handleSubmit = async () => {
     if (!exam) return;
 
-    // 🔎 Validar que todas estén respondidas
     if (Object.keys(answers).length !== exam.questions.length) {
-      alert("Debes responder todas las preguntas antes de enviar.");
+      alert("Debes responder todas las preguntas.");
       return;
     }
 
-    const confirmSubmit = window.confirm(
-      "¿Estás seguro de que deseas enviar el examen?",
-    );
-
-    if (!confirmSubmit) return;
+    if (!confirm("¿Enviar examen?")) return;
 
     try {
       setSubmitting(true);
-
       const data = await submitExam(Number(id), answers);
-
       setResult(data.result);
     } catch (error: any) {
       alert(error.response?.data?.error || "Error al enviar examen");
@@ -58,53 +54,112 @@ const takeExamPage = () => {
     }
   };
 
-  if (loading) return <p>Cargando examen...</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg">
+        Cargando examen...
+      </div>
+    );
+  }
 
   if (result) {
     return (
-      <div>
-        <h2>Resultado</h2>
-        <p>Puntaje: {result.puntaje}%</p>
+      <div className="max-w-xl mx-auto mt-10 bg-white  shadow-xl rounded-2xl p-6 text-center">
+        <h2 className="text-2xl font-bold mb-4">Resultado</h2>
+
+        <p className="text-lg">
+          Puntaje: <span className="font-bold">{result.puntaje}%</span>
+        </p>
         <p>
           Correctas: {result.correctas} / {result.total}
         </p>
-        <p>Puntos ganados: {result.puntos_ganados}</p>
+        <p className="mb-4">
+          Puntos ganados: {result.puntos_ganados}
+        </p>
 
-        <button onClick={() => window.location.reload()}>
-          Volver a intentar
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+        >
+          Intentar nuevamente
         </button>
       </div>
     );
   }
 
+  const total = exam.questions.length;
+  const answered = Object.keys(answers).length;
+  const progress = (answered / total) * 100;
+
   return (
-    <div>
-      <h1>{exam.exam.titulo}</h1>
+    <div className="max-w-4xl mx-auto p-6">
+      
+      {/* HEADER */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">{exam.exam.titulo}</h1>
 
-      {exam.questions.map((q: any) => (
-        <div key={q.id} style={{marginBottom: "20px"}}>
-          <h3>{q.pregunta}</h3>
-
-          {q.options.map((opt: any) => (
-            <label key={opt.id} style={{display: "block"}}>
-              <input
-                type="radio"
-                name={`question-${q.id}`}
-                value={opt.id}
-                checked={answers[q.id] === opt.id}
-                onChange={() => handleSelect(q.id, opt.id)}
-              />
-              {opt.opcion}
-            </label>
-          ))}
+        {/* Progress bar */}
+        <div className="mt-4">
+          <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+            <div
+              className="bg-blue-600 h-3 transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-sm mt-1 text-gray-500">
+            {answered} de {total} respondidas
+          </p>
         </div>
-      ))}
+      </div>
 
-      <button onClick={handleSubmit} disabled={submitting}>
-        {submitting ? "Enviando..." : "Enviar examen"}
-      </button>
+      {/* QUESTIONS */}
+      <div className="space-y-6">
+        {exam.questions.map((q: any, index: number) => (
+          <div
+            key={q.id}
+            className="bg-white shadow-md rounded-xl p-5 border"
+          >
+            <h3 className="font-semibold mb-4">
+              {index + 1}. {q.pregunta}
+            </h3>
+
+            <div className="space-y-2">
+              {q.options.map((opt: any) => (
+                <label
+                  key={opt.id}
+                  className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition 
+                  ${
+                    answers[q.id] === opt.id
+                      ? "bg-blue-100 border-blue-500"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={`question-${q.id}`}
+                    checked={answers[q.id] === opt.id}
+                    onChange={() => handleSelect(q.id, opt.id)}
+                  />
+                  {opt.opcion}
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* SUBMIT BUTTON */}
+      <div className="sticky bottom-0 bg-white dark:bg-gray-800 p-4 mt-6 border-t">
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
+        >
+          {submitting ? "Enviando..." : "Enviar examen"}
+        </button>
+      </div>
     </div>
   );
 };
 
-export default takeExamPage;
+export default TakeExamPage;

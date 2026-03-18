@@ -17,3 +17,15 @@ export interface CourseDTOCreate{
 }
 
 type Grado = "primaria" | "secundaria";
+
+
+export interface getStudents{
+    message: string,
+    data: student[]
+}
+
+export interface student{
+    id: number,
+    nombre: string,
+    email: string
+}

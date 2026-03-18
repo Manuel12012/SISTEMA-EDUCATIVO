@@ -111,4 +111,23 @@ class User extends Model
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $userId]);
     }
+
+    public static function getByRol(string $rol, int $page = 1, int $limit = 10)
+{
+    $db = Database::connect();
+
+    $offset = ($page - 1) * $limit;
+
+    $stmt = $db->prepare(
+        "SELECT * FROM users WHERE rol = :rol LIMIT :limit OFFSET :offset"
+    );
+
+    $stmt->bindValue(":rol", $rol);
+    $stmt->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $stmt->bindValue(":offset", $offset, PDO::PARAM_INT);
+
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

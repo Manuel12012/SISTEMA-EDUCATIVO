@@ -1,7 +1,7 @@
 // Importamos api de api.ts
 import { api } from "./api";
 // Importamos el type de Course y usamos Course con la firma de cada atributo
-import type { Course, CourseDTOCreate } from "../types/course";
+import type { Course, CourseDTOCreate, getStudents } from "../types/course";
 
 // Creamos una funcion getCourses que se encargara de traerse los cursos GET, le decimos que sera un arreglo
 export const getCourses = async (): Promise<Course[]> => {
@@ -60,3 +60,8 @@ export const uploadCourseImage = async (file: File): Promise<{ imageUrl: string 
 
   return data;
 };
+
+export const getStudentsByCourse = async(id: number): Promise<getStudents> => {
+const {data} = await api.get<getStudents>(`/courses/${id}/students`);
+return data;
+}

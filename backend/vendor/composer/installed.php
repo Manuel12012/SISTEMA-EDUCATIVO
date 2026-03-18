@@ -3,7 +3,7 @@
         'name' => 'manuelmeza/backend',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '59e0c90394ddb9b3ce4e4955d36b87214f2ce480',
+        'reference' => 'b8b63ce329c1c0f39a87f6c9af96ccd8bfe8169c',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'manuelmeza/backend' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '59e0c90394ddb9b3ce4e4955d36b87214f2ce480',
+            'reference' => 'b8b63ce329c1c0f39a87f6c9af96ccd8bfe8169c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

@@ -5,7 +5,7 @@ class Database{
         $host = "localhost";
         $db = "plataforma-educativa";
         $user = "root";
-        $pass = "SouthPark_12012";
+        $pass = "";
 
         return new PDO(
             "mysql:host=$host;dbname=$db;charset=utf8",

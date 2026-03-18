@@ -40,6 +40,7 @@ Router::put('courses/{id}', [CourseController::class, 'update']);
 Router::delete('courses/{id}', [CourseController::class, 'destroy']);
 Router::get('courses/{id}/modules', [CourseController::class, 'modules']);
 Router::post('/course/upload', [CourseController::class, 'uploadImage']);
+Router::get('courses/{courseId}/students',[EnrollmentController::class, "getStudentsByCourse"]);
 
 // EXAMS
 Router::get('exams', [ExamController::class, 'allWithQuestionCount']);

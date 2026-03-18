@@ -13,7 +13,7 @@ export const useUser = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [user, setUser] = useState<User | null>(null);
     const [userResult, setUserResult] = useState<ExamResult[]>([]);
-
+    const [students, setStudents] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +31,23 @@ export const useUser = () => {
             setLoading(false);
         }
     }
+    const fetchStudents = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+      
+          const data = await getUsers({ role: "estudiante" });
+      
+          console.log("DATA USERS:", data); // 🔥 DEBUG
+          setStudents(data);
+      
+        } catch (error) {
+          console.error("ERROR USERS:", error); // 🔥
+          setError("Error al obtener estudiantes");
+        } finally {
+          setLoading(false);
+        }
+      };
 
     const fetchUserById = async (id: number) => {
         try {
@@ -126,7 +143,9 @@ export const useUser = () => {
         createUser,
         updateUser,
         deleteUser,
-        fetchResultsByUser
+        fetchResultsByUser,
+        fetchStudents,
+        students
     }
 
 }

@@ -38,21 +38,25 @@ class UserController
 
     public static function index()
     {
-
         $page = $_GET["page"] ?? 1;
         $limit = $_GET["limit"] ?? 10;
-
-        $user = User::paginate($page, $limit);
-
-        if (empty($user)) {
-            Response::json(
-                [
-                    "error" => "No se encontro el usuario"
-                ]
-            );
+        $rol = $_GET["role"] ?? null;
+    
+        // 🔥 SI VIENE FILTRO
+        if ($rol) {
+            $users = User::getByRol($rol, $page, $limit);
+        } else {
+            $users = User::paginate($page, $limit);
+        }
+    
+        if (empty($users)) {
+            Response::json([
+                "error" => "No se encontraron usuarios"
+            ]);
             exit;
         }
-        Response::json($user);
+    
+        Response::json($users);
     }
 
     public static function show($userId)

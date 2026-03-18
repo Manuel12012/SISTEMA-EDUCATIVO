@@ -52,4 +52,21 @@ class EnrollmentController
 
         Response::json($courses);
     }
+
+    public static function getStudentsByCourse($courseId)
+    {
+        if (!is_numeric($courseId)) {
+            Response::json([
+                "error" => "ID del curso inválido"
+            ], 400);
+            return;
+        }
+    
+        $students = CourseEnrollment::getStudentsByCourse((int)$courseId);
+    
+        Response::json([
+            "message" => "Students retrieved successfully",
+            "data" => $students
+        ], 200);
+    }
 }
