@@ -32,15 +32,20 @@ class ModuleController
 
     public static function index()
     {
-        $modules = Module::all();
-
+        $titulo = $_GET["titulo"] ?? null;
+        $course_id = $_GET["course_id"]?? null;
+    
+        if ($titulo && $course_id) {
+            $modules = Module::getByTitle($titulo, $course_id);
+        } else {
+            $modules = Module::all(); // 👈 importante
+        }
+    
         if (empty($modules)) {
-            Response::json([
-                "error" => "No se encontro el modulo"
-            ], 404);
+            Response::json($modules);
             return;
         }
-
+    
         Response::json($modules);
     }
 
@@ -163,4 +168,5 @@ class ModuleController
             "message" => "Modulo eliminado"
         ]);
     }
+
 }

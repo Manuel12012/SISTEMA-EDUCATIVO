@@ -1,16 +1,18 @@
-import {useNavigate, useParams} from "react-router-dom";
-import {useModule} from "../../hooks/core/useModule";
-import {useEffect, useState} from "react";
-import {useCourses} from "../../hooks/core/useCourses";
-import type {Lesson} from "../../types/lesson";
-import type {Module} from "../../types/module";
-import {FaArrowLeft, FaTrash, FaRedo, FaSearch} from "react-icons/fa";
-import {useExams} from "../../hooks/admin/useExams";
-import type {Exam} from "../../types/exam";
+import { useNavigate, useParams } from "react-router-dom";
+import { useModule } from "../../hooks/core/useModule";
+import { useEffect, useRef, useState } from "react";
+import { useCourses } from "../../hooks/core/useCourses";
+import type { Lesson } from "../../types/lesson";
+import type { Module } from "../../types/module";
+import { FaArrowLeft, FaTrash, FaRedo, FaSearch } from "react-icons/fa";
+import { useExams } from "../../hooks/admin/useExams";
+import type { Exam } from "../../types/exam";
 
 const MyModulesPage = () => {
   // recibimos el id
-  const {courseId} = useParams();
+  const { courseId } = useParams();
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
 
@@ -20,20 +22,21 @@ const MyModulesPage = () => {
     error,
     fetchModuleById,
     fetchModules,
+    fetchModulesByTitle,
     fetchModulesByCourse,
   } = useModule();
 
-  const {exams, getByCourse} = useExams();
+  const { exams, getByCourse } = useExams();
 
   const [leccionesVisibles, setLeccionesVisibles] = useState<Set<number>>(
     new Set(),
   );
 
-  const [searchId, setSearchId] = useState<number | "">("");
+  const [searchId, setSearchId] = useState<string | "">("");
 
   const [courseTitle, setCourseTitle] = useState<string>("");
 
-  const {fetchCourseById, fetchLessonsByModule} = useCourses();
+  const { fetchCourseById, fetchLessonsByModule } = useCourses();
 
   const [leccionesPorModulo, setLeccionesPorModulo] = useState<
     Record<number, Lesson[]>
@@ -67,6 +70,43 @@ const MyModulesPage = () => {
   useEffect(() => {
     setDisplayedExams(exams);
   }, [exams]);
+
+  // useEffect para busqueda
+  useEffect(() => {
+
+    const time = setTimeout(() => {
+      // validamos que courseId exista
+      if (!courseId) return;
+
+      // si searchId tiene un array vacio traemos los modulos por curso
+      if (searchId.trim() === "") {
+        fetchModulesByCourse(Number(courseId));
+      }
+
+      // sino traemos por el titulo
+      else {
+        fetchModulesByTitle(searchId, Number(courseId));
+      }
+
+    }, 500)
+
+    // limpiamos el timeOut
+    return () => {
+      clearTimeout(time);
+    }
+
+    // se ejecutara cada vez que searchID cambie
+  }, [searchId, courseId])
+
+  // useEffect para focus en el input
+  useEffect(() => {
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      inputRef.current.focus();
+
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
+    }
+  }, [modules]);
   // manejo de errores
   if (error)
     return (
@@ -93,7 +133,7 @@ const MyModulesPage = () => {
             onClick={() => navigate(-1)}
             className="bg-gray-300 hover:bg-gray-400 px-2 py-2 rounded"
           >
-            Atras
+            <FaArrowLeft />
           </button>
 
           <div>
@@ -112,50 +152,24 @@ const MyModulesPage = () => {
         <div></div>
         <div className="flex gap-2 items center">
           <input
-            type="number"
-            placeholder="Buscar por ID"
+            type="text"
+            placeholder="Buscar Modulo"
             value={searchId}
+            ref={inputRef}
             onChange={(e) =>
               //Si cambia entonces el valor sera ahora el que se ingresara por input
-              setSearchId(e.target.value === "" ? "" : Number(e.target.value))
+              setSearchId(e.target.value)
             }
-            className="border px-2 py-2 rounded w-32"
+            className="border px-2 py-2 rounded w-auto"
           />
-
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={() => {
-              // Si SearchId no es un string vacio entonces:
-              if (searchId !== "") {
-                // Buscamos en find, aquellos que coincidan con el id de search
-                const result = modules.find((q) => q.id === searchId);
-
-                // Si existe entonces traemos el resultado en array si no array vacio
-                setDisplayedModules(result ? [result] : []);
-              } else {
-                //Si es vacio entonces mostramos todas las questions (metodo All de Hook)
-                setDisplayedModules(modules);
-              }
-            }}
-          >
-            <FaSearch />
-          </button>
-
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-            onClick={() => {
-              setSearchId("");
-              fetchModulesByCourse(Number(courseId)); // trae solo los del curso actual
-            }}
-          >
-            <FaRedo />
-          </button>
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold">Modulos del curso</h2>
-
+            {displayedModules.length===0 &&(
+              <div>No hay resultados</div>
+            )}
         {displayedModules.map((m) => (
           <div key={m.id} className="flex justify-between gap-5 w-full">
             <div className="flex flex-col bg-gray-200 p-4 gap-3 rounded text-md w-full">
@@ -217,7 +231,7 @@ const MyModulesPage = () => {
                     <div
                       key={opt.id}
                       className="flex gap-2 items-center border rounded p-2 mb-2"
-                      onClick={() => {}}
+                      onClick={() => { }}
                     >
                       <div className="">{opt.id}</div>
                       {".-"}

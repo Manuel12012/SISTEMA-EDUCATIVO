@@ -6,6 +6,16 @@ export const getModules = async (): Promise<Module[]> => {
     return data;
 }
 
+export const getModuless = async (params?: {
+    titulo?: string;
+    course_id?:number
+}) => {
+    const { data } = await api.get("/modules", {
+        params,
+    });
+    return data;
+}
+
 export const getModuleById = async (id: number): Promise<Module> => {
     const { data } = await api.get<Module>(`/modules/${id}`);
     return data;
@@ -28,7 +38,7 @@ export const deleteModule = async (id: number): Promise<{ message: string }> => 
     return data;
 }
 
-export const getModulesByCourse = async(courseId:number): Promise<Module[]> =>{
-    const {data} = await api.get<Module[]> (`/courses/${courseId}/modules`);
+export const getModulesByCourse = async (courseId: number): Promise<Module[]> => {
+    const { data } = await api.get<Module[]>(`/courses/${courseId}/modules`);
     return data;
 }

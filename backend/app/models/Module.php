@@ -80,4 +80,22 @@ class Module extends Model
         // no devolveremos nada, ya que se borro la pregunta
         return $stmt->execute(["id" => $moduleId]);
     }
+
+    public static function getByTitle($titulo, $course_id) {
+
+        $db = Database::connect();
+    
+        $stmt = $db->prepare(
+            "SELECT * FROM modules WHERE titulo LIKE :titulo 
+            AND course_id = :course_id"
+        );
+    
+        $stmt->bindValue(":titulo", "%" . $titulo . "%");
+        $stmt->bindValue(":course_id",  $course_id );
+
+    
+        $stmt->execute();
+    
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

@@ -88,7 +88,10 @@ const Sidebar = () => {
           Usuarios
         </NavLink>
 
-        <div>
+        <div
+        className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-800 hover:text-white text-gray-300 
+        cursor-pointer"
+        >
           <button onClick={logout}>
             Cerrar sesion
           </button>

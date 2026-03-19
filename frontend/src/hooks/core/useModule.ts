@@ -2,7 +2,8 @@ import { useState } from "react"
 import {
     getModuleById, getModules
     , createModule as createModuleService, updateModule as updateModuleService,
-    deleteModule as deleteModuleService, getModulesByCourse
+    deleteModule as deleteModuleService, getModulesByCourse,
+    getModuless
 } from "../../services/modules.service";
 import type { Module } from "../../types/module";
 
@@ -31,6 +32,21 @@ export const useModule = () => {
             setError("Error al obtener los modulos");
             throw error;
         } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchModulesByTitle = async(titulo?:string, course_id?:number)=>{
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await getModuless({titulo,course_id});
+            setModules(data);
+
+        } catch (error) {
+            setError("Error al obtener el titulo");
+        } finally{
             setLoading(false);
         }
     }
@@ -127,7 +143,8 @@ export const useModule = () => {
         createModule,
         updateModule,
         deleteModule,
-        fetchModulesByCourse
+        fetchModulesByCourse,
+        fetchModulesByTitle
     }
 }
 

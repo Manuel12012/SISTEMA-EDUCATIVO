@@ -40,9 +40,7 @@ class ExamController
         $getQuestions = Exam::getQuestionsByExam($examId);
 
         if (!$getQuestions) {
-            Response::json([
-                "error" => "Pregunta no encontrada"
-            ], 404);
+            Response::json([]);
             return;
         }
 
